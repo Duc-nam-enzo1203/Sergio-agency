@@ -4,6 +4,14 @@ import { prisma } from "@/lib/prisma";
 
 export default async function AdminProjectsPage() {
   const projects = await prisma.project.findMany({
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      category: true,
+      published: true,
+      featured: true,
+    },
     orderBy: [{ order: "asc" }, { updatedAt: "desc" }],
   });
 

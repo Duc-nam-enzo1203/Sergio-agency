@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { CoverImageField } from "@/components/dashboard/CoverImageField";
+import { DarkSelect } from "@/components/dashboard/DarkSelect";
 import { slugify } from "@/lib/validations";
 
 type ProjectFormData = {
@@ -26,7 +28,13 @@ type ProjectFormProps = {
 };
 
 const inputClass =
-  "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-white/30 focus:outline-none";
+  "w-full rounded-xl border border-white/10 bg-[#1a1a1a] px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-white/30 focus:outline-none";
+
+const CATEGORY_OPTIONS = [
+  { value: "Website", label: "Website" },
+  { value: "Landing Page", label: "Landing Page" },
+  { value: "E-commerce", label: "E-commerce" },
+];
 
 export function ProjectForm({ initial }: ProjectFormProps) {
   const router = useRouter();
@@ -39,7 +47,7 @@ export function ProjectForm({ initial }: ProjectFormProps) {
     content: initial?.content ?? "",
     coverImage: initial?.coverImage ?? "",
     client: initial?.client ?? "",
-    category: initial?.category ?? "Website",
+    category: initial?.category || "Website",
     year: initial?.year ?? new Date().getFullYear().toString(),
     url: initial?.url ?? "",
     color: initial?.color ?? "from-violet-500/20 to-indigo-500/10",
@@ -52,7 +60,7 @@ export function ProjectForm({ initial }: ProjectFormProps) {
   function update(field: keyof ProjectFormData, value: string | boolean) {
     setForm((prev) => {
       const next = { ...prev, [field]: value };
-      if (field === "title" && !initial?.id) {
+      if (field === "title") {
         next.slug = slugify(value as string);
       }
       return next;
@@ -76,21 +84,26 @@ export function ProjectForm({ initial }: ProjectFormProps) {
     const url = form.id ? `/api/projects/${form.id}` : "/api/projects";
     const method = form.id ? "PATCH" : "POST";
 
-    const res = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    if (!res.ok) {
-      const data = await res.json();
-      setError(data.error ?? "Có lỗi xảy ra");
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error ?? "Có lỗi xảy ra");
+        setLoading(false);
+        return;
+      }
+
+      router.push("/dashboard/du-an");
+      router.refresh();
+    } catch {
+      setError("Không thể kết nối máy chủ");
       setLoading(false);
-      return;
     }
-
-    router.push("/dashboard/du-an");
-    router.refresh();
   }
 
   return (
@@ -114,11 +127,15 @@ export function ProjectForm({ initial }: ProjectFormProps) {
         <div>
           <label className="mb-2 block text-sm text-white/60">Slug</label>
           <input
-            className={inputClass}
+            className={`${inputClass} text-white/70`}
             value={form.slug}
-            onChange={(e) => update("slug", e.target.value)}
+            onChange={(e) => update("slug", slugify(e.target.value))}
             required
+            title="Tự cập nhật theo tiêu đề"
           />
+          <p className="mt-1 text-xs text-white/35">
+            Tự tạo từ tiêu đề (dấu - giữa các từ)
+          </p>
         </div>
       </div>
 
@@ -140,15 +157,11 @@ export function ProjectForm({ initial }: ProjectFormProps) {
         />
       </div>
 
-      <div>
-        <label className="mb-2 block text-sm text-white/60">URL ảnh cover</label>
-        <input
-          className={inputClass}
-          value={form.coverImage}
-          onChange={(e) => update("coverImage", e.target.value)}
-          placeholder="https://images.unsplash.com/..."
-        />
-      </div>
+      <CoverImageField
+        value={form.coverImage}
+        onChange={(url) => update("coverImage", url)}
+        inputClass={inputClass}
+      />
 
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
@@ -161,15 +174,11 @@ export function ProjectForm({ initial }: ProjectFormProps) {
         </div>
         <div>
           <label className="mb-2 block text-sm text-white/60">Danh mục</label>
-          <select
-            className={inputClass}
+          <DarkSelect
             value={form.category}
-            onChange={(e) => update("category", e.target.value)}
-          >
-            <option value="Website">Website</option>
-            <option value="Landing Page">Landing Page</option>
-            <option value="E-commerce">E-commerce</option>
-          </select>
+            onChange={(value) => update("category", value)}
+            options={CATEGORY_OPTIONS}
+          />
         </div>
       </div>
 

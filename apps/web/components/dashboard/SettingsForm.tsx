@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { DarkSelect } from "@/components/dashboard/DarkSelect";
 
 type SettingsData = {
   siteName: string;
@@ -112,16 +113,18 @@ export function SettingsForm({ initial, leads }: SettingsFormProps) {
                     <p className="text-sm text-white/50">{lead.email}</p>
                     <p className="mt-2 text-sm text-white/70">{lead.message}</p>
                   </div>
-                  <select
-                    value={lead.status}
-                    onChange={(e) => updateLeadStatus(lead.id, e.target.value)}
-                    className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs"
-                  >
-                    <option value="NEW">NEW</option>
-                    <option value="CONTACTED">CONTACTED</option>
-                    <option value="QUALIFIED">QUALIFIED</option>
-                    <option value="CLOSED">CLOSED</option>
-                  </select>
+                  <div className="w-36 shrink-0">
+                    <DarkSelect
+                      value={lead.status}
+                      onChange={(value) => updateLeadStatus(lead.id, value)}
+                      options={[
+                        { value: "NEW", label: "NEW" },
+                        { value: "CONTACTED", label: "CONTACTED" },
+                        { value: "QUALIFIED", label: "QUALIFIED" },
+                        { value: "CLOSED", label: "CLOSED" },
+                      ]}
+                    />
+                  </div>
                 </div>
               </li>
             ))}

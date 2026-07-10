@@ -103,6 +103,13 @@ export async function getDashboardStats() {
 
 export async function getRecentLeads(limit = 5) {
   return prisma.lead.findMany({
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      status: true,
+      createdAt: true,
+    },
     orderBy: { createdAt: "desc" },
     take: limit,
   });

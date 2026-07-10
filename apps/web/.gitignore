@@ -53,3 +53,7 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# uploaded images (keep folder)
+/public/uploads/*
+!/public/uploads/.gitkeep

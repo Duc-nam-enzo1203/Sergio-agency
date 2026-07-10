@@ -43,3 +43,15 @@ body {
 ::selection {
   background: rgba(17, 17, 17, 0.15);
 }
+
+/* Dark native selects (dashboard) */
+.color-scheme-dark,
+select.color-scheme-dark {
+  color-scheme: dark;
+}
+
+.color-scheme-dark option,
+select.color-scheme-dark option {
+  background-color: #1a1a1a;
+  color: #fff;
+}

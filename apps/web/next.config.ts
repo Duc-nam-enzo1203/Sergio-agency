@@ -15,7 +15,7 @@ const securityHeaders = [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://images.unsplash.com",
+      "img-src 'self' data: blob: https: http:",
       "font-src 'self' data:",
       "connect-src 'self'",
       "frame-ancestors 'self'",
@@ -32,6 +32,22 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.public.blob.vercel-storage.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.vercel-storage.com",
+      },
+      {
+        protocol: "http",
+        hostname: "oceancityhanoi.vn",
+      },
+      {
+        protocol: "https",
+        hostname: "oceancityhanoi.vn",
       },
     ],
   },

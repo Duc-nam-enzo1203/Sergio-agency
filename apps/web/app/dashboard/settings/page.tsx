@@ -4,7 +4,21 @@ import { prisma } from "@/lib/prisma";
 export default async function SettingsPage() {
   const [settings, leads] = await Promise.all([
     prisma.siteSettings.findUnique({ where: { id: "default" } }),
-    prisma.lead.findMany({ orderBy: { createdAt: "desc" } }),
+    prisma.lead.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        company: true,
+        service: true,
+        budget: true,
+        message: true,
+        status: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: "desc" },
+    }),
   ]);
 
   return (
