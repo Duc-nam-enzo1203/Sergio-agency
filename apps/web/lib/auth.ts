@@ -24,8 +24,19 @@ function assertAuthSecret() {
       "AUTH_SECRET must be set to a strong value (32+ chars) in production.",
     );
   }
-  const weak = ["your-secret", "change-me", "secret", "dev-secret"];
-  if (weak.some((w) => secret.toLowerCase().includes(w))) {
+  const normalized = secret.toLowerCase();
+  const weakExact = new Set([
+    "secret",
+    "changeme",
+    "change-me",
+    "your-secret-here",
+    "dev-secret",
+  ]);
+  if (
+    weakExact.has(normalized) ||
+    normalized.includes("your-secret-here") ||
+    normalized.includes("change-in-production")
+  ) {
     throw new Error("AUTH_SECRET looks like a placeholder. Rotate it.");
   }
 }
