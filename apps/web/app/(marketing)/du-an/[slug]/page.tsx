@@ -38,7 +38,7 @@ export default async function ProjectDetailPage({ params }: Props) {
   return (
     <>
       <section className="relative pt-28 sm:pt-32">
-        <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="relative site-container">
           <AnimateOnScroll>
             <Link
               href="/du-an"
@@ -56,7 +56,7 @@ export default async function ProjectDetailPage({ params }: Props) {
                 fill
                 className="object-cover"
                 priority
-                sizes="100vw"
+                sizes="(max-width: 1152px) calc(100vw - 2rem), 1400px"
               />
             )}
             <div
@@ -150,7 +150,7 @@ export default async function ProjectDetailPage({ params }: Props) {
 
       {related.length > 0 && (
         <section className="py-16 sm:py-20">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="site-container">
             <h2 className="font-display text-2xl font-semibold text-ink">
               Dự án liên quan
             </h2>

@@ -17,6 +17,7 @@
   --font-sans: var(--font-plus-jakarta);
   --font-display: var(--font-plus-jakarta);
   --animate-marquee: marquee 30s linear infinite;
+  --container-site: 87.5rem;
 }
 
 @keyframes marquee {
@@ -38,6 +39,30 @@ body {
   background: var(--cream);
   color: var(--ink);
   font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+}
+
+.site-container {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 1400px;
+  padding-inline: 1rem;
+}
+
+@media (min-width: 640px) {
+  .site-container {
+    padding-inline: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .site-container {
+    padding-inline: 2rem;
+  }
+}
+
+html.has-custom-cursor,
+html.has-custom-cursor * {
+  cursor: none !important;
 }
 
 ::selection {

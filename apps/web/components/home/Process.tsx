@@ -5,7 +5,7 @@ import { processSteps } from "@/lib/data";
 export function Process() {
   return (
     <section className="py-24 sm:py-32">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+      <div className="site-container">
         <SectionHeading
           eyebrow="Quy trình"
           title="Làm việc minh bạch, bàn giao đúng hạn"

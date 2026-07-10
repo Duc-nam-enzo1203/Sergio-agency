@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { AnimateOnScroll } from "@/components/ui/AnimateOnScroll";
 import { Button } from "@/components/ui/Button";
-import { SectionHeading } from "@/components/ui/SectionHeading";
 
 type PostItem = {
   id: string;
@@ -26,13 +25,22 @@ function formatDate(date: Date | null) {
 export function BlogPreview({ items }: BlogPreviewProps) {
   return (
     <section className="bg-cream-dark/30 py-24 sm:py-32">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+      <div className="site-container">
         <div className="flex flex-col items-start justify-between gap-8 sm:flex-row sm:items-end">
-          <SectionHeading
-            eyebrow="Bài viết"
-            title="Kiến thức & xu hướng"
-            description="Chia sẻ kinh nghiệm thiết kế web, landing page và digital marketing."
-          />
+          <div className="max-w-2xl">
+            <AnimateOnScroll>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-ink/40">
+                Insights
+              </p>
+              <h2 className="font-display mt-4 text-[clamp(2rem,4.5vw,3.25rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-ink">
+                Kiến thức & xu hướng.
+              </h2>
+              <p className="mt-4 max-w-md text-sm leading-relaxed text-ink/55 sm:text-base">
+                Chia sẻ kinh nghiệm thiết kế web, landing page và digital
+                marketing.
+              </p>
+            </AnimateOnScroll>
+          </div>
           <AnimateOnScroll>
             <Button href="/bai-viet" variant="secondary" className="shrink-0">
               Xem tất cả
@@ -47,14 +55,16 @@ export function BlogPreview({ items }: BlogPreviewProps) {
                 href={`/bai-viet/${post.slug}`}
                 className="group flex h-full flex-col overflow-hidden rounded-[1.75rem] bg-cream p-1.5 ring-1 ring-ink/5 transition-all duration-500 hover:ring-ink/10"
               >
-                <div className="relative aspect-[16/10] overflow-hidden rounded-[calc(1.75rem-0.375rem)]">
-                  <Image
-                    src={post.coverImage ?? "/next.svg"}
-                    alt={post.title}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                  />
+                <div className="relative aspect-[16/10] overflow-hidden rounded-[calc(1.75rem-0.375rem)] bg-ink/5">
+                  {post.coverImage ? (
+                    <Image
+                      src={post.coverImage}
+                      alt={post.title}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
+                  ) : null}
                 </div>
                 <div className="flex flex-1 flex-col p-5">
                   <div className="flex items-center gap-3 text-xs text-ink/50">

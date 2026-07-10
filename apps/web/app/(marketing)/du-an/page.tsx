@@ -21,7 +21,7 @@ export default async function ProjectsPage() {
       />
 
       <section className="pb-24 sm:pb-32">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="site-container">
           <ProjectGrid
             projects={projects.map((p) => ({
               id: p.id,

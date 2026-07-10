@@ -13,7 +13,7 @@ export function PageHero({ eyebrow, title, description }: PageHeroProps) {
         <div className="absolute -top-1/4 right-0 h-[400px] w-[400px] rounded-full bg-gradient-to-br from-violet-300/20 to-transparent blur-3xl" />
         <div className="absolute -bottom-1/4 -left-1/4 h-[300px] w-[300px] rounded-full bg-gradient-to-tr from-teal-300/15 to-transparent blur-3xl" />
       </div>
-      <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+      <div className="relative site-container">
         <AnimateOnScroll>
           <span className="mb-4 inline-block rounded-full bg-ink/5 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-ink/60">
             {eyebrow}

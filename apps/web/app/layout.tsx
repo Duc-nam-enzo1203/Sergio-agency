@@ -31,9 +31,10 @@ export default function RootLayout({
     <html
       lang="vi"
       data-scroll-behavior="smooth"
-      className={`${plusJakarta.variable} h-full scroll-smooth`}
+      className={`${plusJakarta.variable} h-full`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full antialiased">
+      <body className="min-h-full antialiased" suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>
     </html>

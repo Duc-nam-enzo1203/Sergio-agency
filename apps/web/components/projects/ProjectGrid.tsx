@@ -49,25 +49,33 @@ export function ProjectGrid({ projects }: ProjectGridProps) {
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.map((project, i) => (
-          <AnimateOnScroll key={project.id} delay={i * 0.06}>
+          <AnimateOnScroll key={project.id} delay={i * 0.06} variant="scale">
             <Link
               href={`/du-an/${project.slug}`}
-              className="group block overflow-hidden rounded-[1.75rem] bg-ink/[0.03] p-1.5 ring-1 ring-ink/5 transition-all duration-500 hover:ring-ink/10"
+              className="group block overflow-hidden rounded-[1.75rem] bg-ink/[0.03] p-1.5 ring-1 ring-ink/5 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1.5 hover:bg-ink/[0.05] hover:ring-ink/15 hover:shadow-[0_20px_50px_-28px_rgba(17,17,17,0.35)]"
             >
               <div className="overflow-hidden rounded-[calc(1.75rem-0.375rem)] bg-cream">
-                <div className="relative aspect-[4/3] overflow-hidden">
-                  <Image
-                    src={project.image}
-                    alt={project.title}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                  />
+                <div className="relative aspect-[4/3] overflow-hidden bg-ink/5">
+                  {project.image ? (
+                    <Image
+                      src={project.image}
+                      alt={project.title}
+                      fill
+                      className="object-cover transition-transform duration-[1.1s] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform group-hover:scale-[1.08]"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-ink/10 to-ink/5">
+                      <span className="text-xs font-medium uppercase tracking-widest text-ink/30">
+                        No image
+                      </span>
+                    </div>
+                  )}
                   <div
-                    className={`absolute inset-0 bg-gradient-to-t ${project.color} to-transparent opacity-60`}
+                    className={`absolute inset-0 bg-gradient-to-t ${project.color || "from-ink/20"} to-transparent opacity-50 transition-opacity duration-500 group-hover:opacity-35`}
                   />
                 </div>
-                <div className="p-6">
+                <div className="p-6 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0.5">
                   <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-ink/50">
                     {project.category}
                   </span>
@@ -77,7 +85,7 @@ export function ProjectGrid({ projects }: ProjectGridProps) {
                   <p className="mt-2 text-sm leading-relaxed text-ink/60">
                     {project.description}
                   </p>
-                  <span className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-ink/70 transition-colors group-hover:text-ink">
+                  <span className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-ink/70 transition-all duration-500 group-hover:gap-3 group-hover:text-ink">
                     Xem chi tiết
                     <svg
                       width="14"

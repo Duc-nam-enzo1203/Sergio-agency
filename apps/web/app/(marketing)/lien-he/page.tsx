@@ -19,7 +19,7 @@ export default function ContactPage() {
       />
 
       <section className="pb-24 sm:pb-32">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="site-container">
           <div className="grid gap-12 lg:grid-cols-5">
             <div className="lg:col-span-2">
               <AnimateOnScroll>

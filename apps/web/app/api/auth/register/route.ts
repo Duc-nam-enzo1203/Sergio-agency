@@ -5,6 +5,10 @@ import { getClientIp, rateLimit, rateLimitResponse } from "@/lib/rate-limit";
 import { sanitizeEmail, sanitizeText } from "@/lib/sanitize";
 import { registerSchema } from "@/lib/validations";
 
+/**
+ * Bootstrap-only registration: creates the first ADMIN when the DB has no users.
+ * Public self-signup is disabled — staff accounts must be created by an admin.
+ */
 export async function POST(request: Request) {
   try {
     const ip = getClientIp(request);
@@ -14,13 +18,13 @@ export async function POST(request: Request) {
     }
 
     const userCount = await prisma.user.count();
-    const allowPublic = process.env.ALLOW_PUBLIC_REGISTER === "true";
-
-    // Only bootstrap first admin OR when explicitly enabled
-    if (userCount > 0 && !allowPublic) {
+    if (userCount > 0) {
       return NextResponse.json(
-        { error: "Đăng ký công khai đã bị tắt. Liên hệ admin." },
-        { status: 403 }
+        {
+          error:
+            "Đăng ký công khai đã bị tắt. Liên hệ admin để được cấp tài khoản.",
+        },
+        { status: 403 },
       );
     }
 
@@ -30,7 +34,7 @@ export async function POST(request: Request) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -43,7 +47,7 @@ export async function POST(request: Request) {
     if (existing) {
       return NextResponse.json(
         { error: "Email đã được sử dụng" },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
@@ -54,7 +58,7 @@ export async function POST(request: Request) {
         name: sanitizeText(name, 100),
         email: cleanEmail,
         passwordHash,
-        role: userCount === 0 ? "ADMIN" : "EDITOR",
+        role: "ADMIN",
       },
     });
 
@@ -62,7 +66,7 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json(
       { error: "Không thể tạo tài khoản" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

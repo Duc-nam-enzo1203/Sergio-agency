@@ -28,7 +28,7 @@ export default async function BlogPage() {
       />
 
       <section className="pb-24 sm:pb-32">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="site-container">
           <div className="grid gap-6 sm:grid-cols-2">
             {posts.map((post, i) => (
               <AnimateOnScroll

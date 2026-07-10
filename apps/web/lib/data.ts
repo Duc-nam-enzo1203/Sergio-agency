@@ -1,9 +1,9 @@
 export const siteConfig = {
   name: "Sergio Agency",
   tagline: "Thiết kế website & landing page",
-  email: "hello@sergioagency.com",
-  phone: "+84 901 234 567",
-  address: "TP. Hồ Chí Minh, Việt Nam",
+  email: "namdoan.ka@gmail.com",
+  phone: "0866634302",
+  address: "Hà Nội, Việt Nam",
 };
 
 export const navLinks = [

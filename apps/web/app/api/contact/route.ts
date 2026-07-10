@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { sendContactNotification } from "@/lib/mail";
 import { getClientIp, rateLimit, rateLimitResponse } from "@/lib/rate-limit";
 import {
   sanitizeEmail,
@@ -29,30 +30,41 @@ export async function POST(request: Request) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const data = parsed.data;
+    const leadPayload = {
+      name: sanitizeText(data.name, 100),
+      email: sanitizeEmail(data.email),
+      phone: sanitizeOptional(data.phone, 50),
+      company: sanitizeOptional(data.company, 200),
+      service: sanitizeOptional(data.service, 100),
+      budget: sanitizeOptional(data.budget, 100),
+      message: sanitizeText(data.message, 5000),
+    };
+
     const lead = await prisma.lead.create({
-      data: {
-        name: sanitizeText(data.name, 100),
-        email: sanitizeEmail(data.email),
-        phone: sanitizeOptional(data.phone, 50),
-        company: sanitizeOptional(data.company, 200),
-        service: sanitizeOptional(data.service, 100),
-        budget: sanitizeOptional(data.budget, 100),
-        message: sanitizeText(data.message, 5000),
-      },
+      data: leadPayload,
     });
+
+    const mail = await sendContactNotification(leadPayload);
+    if (!mail.ok) {
+      console.error("[contact] email failed", mail.provider, mail.error);
+    }
 
     revalidatePath("/dashboard");
 
-    return NextResponse.json({ success: true, id: lead.id });
+    return NextResponse.json({
+      success: true,
+      id: lead.id,
+      emailed: mail.ok,
+    });
   } catch {
     return NextResponse.json(
       { error: "Không thể gửi tin nhắn. Vui lòng thử lại." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

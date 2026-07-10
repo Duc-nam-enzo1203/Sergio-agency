@@ -32,7 +32,7 @@ export default async function ServiceDetailPage({ params }: Props) {
   return (
     <>
       <section className="relative overflow-hidden pt-28 pb-12 sm:pt-32">
-        <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="relative site-container">
           <AnimateOnScroll>
             <Link
               href="/dich-vu"
@@ -65,7 +65,7 @@ export default async function ServiceDetailPage({ params }: Props) {
       </section>
 
       <section className="py-16 sm:py-20">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="site-container">
           <div className="grid gap-16 lg:grid-cols-2">
             <AnimateOnScroll>
               <h2 className="font-display text-2xl font-semibold text-ink">

@@ -1,21 +1,26 @@
 import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
+const STAFF_ROLES = new Set(["ADMIN", "EDITOR"]);
+
 export async function requireAuth() {
   const session = await auth();
-  if (!session?.user) {
-    return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
+  if (!session?.user?.id) {
+    return {
+      error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }),
+    };
   }
+
+  const role = String(session.user.role ?? "").toUpperCase();
+  if (role === "REVOKED" || !STAFF_ROLES.has(role)) {
+    return {
+      error: NextResponse.json({ error: "Forbidden" }, { status: 403 }),
+    };
+  }
+
   return { session };
 }
 
 export async function requireAdmin() {
-  const result = await requireAuth();
-  if ("error" in result) return result;
-
-  const role = result.session.user.role;
-  if (role !== "ADMIN" && role !== "EDITOR") {
-    return { error: NextResponse.json({ error: "Forbidden" }, { status: 403 }) };
-  }
-  return result;
+  return requireAuth();
 }

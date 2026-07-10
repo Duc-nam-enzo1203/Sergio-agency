@@ -5,6 +5,9 @@ import { prisma } from "@/lib/prisma";
 import { settingsSchema } from "@/lib/validations";
 
 export async function GET() {
+  const auth = await requireAdmin();
+  if ("error" in auth) return auth.error;
+
   const settings = await prisma.siteSettings.findUnique({
     where: { id: "default" },
   });

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { isSafeHttpUrl } from "@/lib/validations";
 
 type ButtonProps = {
   href: string;
@@ -53,16 +54,23 @@ export function Button({
   );
 
   if (external) {
+    if (!isSafeHttpUrl(href) || href.startsWith("/")) {
+      return null;
+    }
     return (
       <a
         href={href}
         target="_blank"
-        rel="noopener noreferrer"
+        rel="noopener noreferrer nofollow"
         className={`${base} ${variants[variant]} ${className}`}
       >
         {content}
       </a>
     );
+  }
+
+  if (!href.startsWith("/") || href.startsWith("//")) {
+    return null;
   }
 
   return (

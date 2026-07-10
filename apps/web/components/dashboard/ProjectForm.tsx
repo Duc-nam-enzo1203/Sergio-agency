@@ -183,6 +183,20 @@ export function ProjectForm({ initial }: ProjectFormProps) {
       </div>
 
       <div>
+        <label className="mb-2 block text-sm text-white/60">URL live demo</label>
+        <input
+          className={inputClass}
+          type="url"
+          value={form.url}
+          onChange={(e) => update("url", e.target.value)}
+          placeholder="https://ten-du-an.com"
+        />
+        <p className="mt-1 text-xs text-white/35">
+          Link nút &quot;Xem live demo&quot; trên trang dự án. Để trống nếu chưa có.
+        </p>
+      </div>
+
+      <div>
         <label className="mb-2 block text-sm text-white/60">
           Tech stack (phân cách bằng dấu phẩy)
         </label>

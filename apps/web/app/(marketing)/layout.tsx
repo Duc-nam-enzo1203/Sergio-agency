@@ -1,5 +1,7 @@
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
+import { CustomCursor } from "@/components/providers/CustomCursor";
+import { SmoothScroll } from "@/components/providers/SmoothScroll";
 
 export default function MarketingLayout({
   children,
@@ -7,10 +9,11 @@ export default function MarketingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
+    <SmoothScroll>
+      <CustomCursor />
       <Navbar />
       <main>{children}</main>
       <Footer />
-    </>
+    </SmoothScroll>
   );
 }

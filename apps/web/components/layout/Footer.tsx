@@ -6,7 +6,7 @@ export function Footer() {
 
   return (
     <footer className="border-t border-ink/10 bg-cream">
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
+      <div className="site-container py-16 lg:py-20">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-2">
             <Link
@@ -71,7 +71,7 @@ export function Footer() {
                   {siteConfig.phone}
                 </a>
               </li>
-              <li>TP. Hồ Chí Minh, Việt Nam</li>
+              <li>{siteConfig.address}</li>
             </ul>
           </div>
         </div>

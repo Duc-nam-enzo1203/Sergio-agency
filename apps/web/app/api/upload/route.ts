@@ -4,18 +4,45 @@ import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/api-auth";
+import { getClientIp, rateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
 const MAX_BYTES = 5 * 1024 * 1024;
-const ALLOWED = new Set([
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/gif",
-]);
 
-function extensionFor(type: string): string {
+type ImageKind = "image/jpeg" | "image/png" | "image/webp" | "image/gif";
+
+function detectImageType(buffer: Buffer): ImageKind | null {
+  if (buffer.length < 12) return null;
+  if (buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) {
+    return "image/jpeg";
+  }
+  if (
+    buffer[0] === 0x89 &&
+    buffer[1] === 0x50 &&
+    buffer[2] === 0x4e &&
+    buffer[3] === 0x47
+  ) {
+    return "image/png";
+  }
+  if (
+    buffer[0] === 0x47 &&
+    buffer[1] === 0x49 &&
+    buffer[2] === 0x46 &&
+    buffer[3] === 0x38
+  ) {
+    return "image/gif";
+  }
+  if (
+    buffer.toString("ascii", 0, 4) === "RIFF" &&
+    buffer.toString("ascii", 8, 12) === "WEBP"
+  ) {
+    return "image/webp";
+  }
+  return null;
+}
+
+function extensionFor(type: ImageKind): string {
   switch (type) {
     case "image/png":
       return "png";
@@ -39,6 +66,11 @@ export async function POST(request: Request) {
   const auth = await requireAdmin();
   if ("error" in auth) return auth.error;
 
+  const ip = getClientIp(request);
+  const userId = auth.session.user.id ?? "unknown";
+  const limited = rateLimit(`upload:${userId}:${ip}`, 20, 60_000);
+  if (!limited.success) return rateLimitResponse(limited.resetAt);
+
   try {
     const form = await request.formData();
     const file = form.get("file");
@@ -47,14 +79,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Thiếu file ảnh" }, { status: 400 });
     }
 
-    if (!ALLOWED.has(file.type)) {
-      return NextResponse.json(
-        { error: "Chỉ chấp nhận JPG, PNG, WebP, GIF" },
-        { status: 400 },
-      );
-    }
-
-    if (file.size > MAX_BYTES) {
+    if (file.size <= 0 || file.size > MAX_BYTES) {
       return NextResponse.json(
         { error: "Ảnh tối đa 5MB" },
         { status: 400 },
@@ -62,15 +87,30 @@ export async function POST(request: Request) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const filename = `${randomUUID()}.${extensionFor(file.type)}`;
+    const detected = detectImageType(buffer);
+    if (!detected) {
+      return NextResponse.json(
+        { error: "File không phải ảnh hợp lệ (JPG/PNG/WebP/GIF)" },
+        { status: 400 },
+      );
+    }
+
+    const filename = `${randomUUID()}.${extensionFor(detected)}`;
 
     if (process.env.BLOB_READ_WRITE_TOKEN) {
       const blob = await put(`uploads/${filename}`, buffer, {
         access: "public",
-        contentType: file.type,
+        contentType: detected,
         token: process.env.BLOB_READ_WRITE_TOKEN,
       });
       return NextResponse.json({ url: blob.url });
+    }
+
+    if (process.env.VERCEL) {
+      return NextResponse.json(
+        { error: "Upload yêu cầu BLOB_READ_WRITE_TOKEN trên Vercel" },
+        { status: 503 },
+      );
     }
 
     const url = await saveLocal(buffer, filename);

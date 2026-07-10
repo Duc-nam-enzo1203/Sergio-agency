@@ -1,35 +1,51 @@
-import { trustedLogos } from "@/lib/data";
+import Link from "next/link";
 
-export function TrustedMarquee() {
-  const logos = [...trustedLogos, ...trustedLogos];
+type ProjectItem = {
+  title: string;
+  slug: string;
+};
+
+type TrustedMarqueeProps = {
+  projects: ProjectItem[];
+};
+
+export function TrustedMarquee({ projects }: TrustedMarqueeProps) {
+  if (projects.length === 0) return null;
+
+  const items = [...projects, ...projects];
 
   return (
-    <section className="overflow-hidden border-y border-ink/10 bg-cream-dark/50 py-8">
-      <p className="mb-6 text-center text-[10px] font-medium uppercase tracking-[0.2em] text-ink/40">
-        Được tin tưởng bởi
-      </p>
-      <div className="relative flex overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
-        <div className="animate-marquee flex shrink-0 items-center gap-12 pr-12">
-          {logos.map((logo, i) => (
-            <span
-              key={`a-${logo}-${i}`}
-              className="whitespace-nowrap font-display text-lg font-medium text-ink/30"
+    <section className="overflow-hidden border-b border-ink/10 bg-cream py-10">
+      <div className="site-container mb-6 flex items-center justify-between">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-ink/35">
+          Selected projects
+        </p>
+      </div>
+      <div className="relative flex overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+        <div className="animate-marquee flex shrink-0 items-center gap-14 pr-14">
+          {items.map((project, i) => (
+            <Link
+              key={`a-${project.slug}-${i}`}
+              href={`/du-an/${project.slug}`}
+              className="whitespace-nowrap font-display text-xl font-semibold tracking-tight text-ink/25 transition-colors duration-300 hover:text-ink"
             >
-              {logo}
-            </span>
+              {project.title}
+            </Link>
           ))}
         </div>
         <div
           aria-hidden
-          className="animate-marquee flex shrink-0 items-center gap-12 pr-12"
+          className="animate-marquee flex shrink-0 items-center gap-14 pr-14"
         >
-          {logos.map((logo, i) => (
-            <span
-              key={`b-${logo}-${i}`}
-              className="whitespace-nowrap font-display text-lg font-medium text-ink/30"
+          {items.map((project, i) => (
+            <Link
+              key={`b-${project.slug}-${i}`}
+              href={`/du-an/${project.slug}`}
+              tabIndex={-1}
+              className="whitespace-nowrap font-display text-xl font-semibold tracking-tight text-ink/25 transition-colors duration-300 hover:text-ink"
             >
-              {logo}
-            </span>
+              {project.title}
+            </Link>
           ))}
         </div>
       </div>

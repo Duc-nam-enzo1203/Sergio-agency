@@ -28,9 +28,9 @@ export function Navbar() {
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-50 px-4 pt-5 sm:px-6">
+      <header className="fixed inset-x-0 top-0 z-50 pt-5">
         <nav
-          className={`mx-auto flex max-w-6xl items-center justify-between rounded-full px-4 py-2.5 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] sm:px-6 ${
+          className={`site-container flex items-center justify-between rounded-full px-4 py-2.5 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] sm:px-6 ${
             scrolled || menuOpen
               ? "bg-cream/80 shadow-[0_8px_32px_rgba(17,17,17,0.06)] backdrop-blur-xl ring-1 ring-ink/5"
               : "bg-transparent"

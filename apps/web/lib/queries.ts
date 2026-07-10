@@ -9,6 +9,21 @@ export async function getPublishedServices() {
   return items.map(parseService);
 }
 
+/** Lightweight list for homepage cards (skips heavy JSON fields). */
+export async function getHomeServices() {
+  return prisma.service.findMany({
+    where: { published: true },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      icon: true,
+      slug: true,
+    },
+    orderBy: { order: "asc" },
+  });
+}
+
 export async function getServiceBySlug(slug: string) {
   const item = await prisma.service.findFirst({
     where: { slug, published: true },
@@ -19,18 +34,47 @@ export async function getServiceBySlug(slug: string) {
 export async function getPublishedProjects() {
   const items = await prisma.project.findMany({
     where: { published: true },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      description: true,
+      coverImage: true,
+      category: true,
+      color: true,
+      client: true,
+      year: true,
+      url: true,
+      featured: true,
+      order: true,
+      published: true,
+      images: true,
+      techStack: true,
+      createdAt: true,
+      updatedAt: true,
+    },
     orderBy: [{ order: "asc" }, { createdAt: "desc" }],
   });
-  return items.map(parseProject);
+  return items.map((p) =>
+    parseProject({ ...p, content: p.description ?? "" }),
+  );
 }
 
 export async function getFeaturedProjects() {
-  const items = await prisma.project.findMany({
+  return prisma.project.findMany({
     where: { published: true, featured: true },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      description: true,
+      coverImage: true,
+      category: true,
+      color: true,
+    },
     orderBy: { order: "asc" },
     take: 3,
   });
-  return items.map(parseProject);
 }
 
 export async function getProjectBySlug(slug: string) {
@@ -41,7 +85,10 @@ export async function getProjectBySlug(slug: string) {
 }
 
 export async function getRelatedProjects(slug: string, limit = 2) {
-  const current = await getProjectBySlug(slug);
+  const current = await prisma.project.findFirst({
+    where: { slug, published: true },
+    select: { category: true },
+  });
   if (!current) return [];
   const items = await prisma.project.findMany({
     where: {
@@ -49,14 +96,46 @@ export async function getRelatedProjects(slug: string, limit = 2) {
       category: current.category,
       slug: { not: slug },
     },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      description: true,
+      coverImage: true,
+      category: true,
+      color: true,
+      client: true,
+      year: true,
+      url: true,
+      featured: true,
+      order: true,
+      published: true,
+      images: true,
+      techStack: true,
+      createdAt: true,
+      updatedAt: true,
+    },
     take: limit,
   });
-  return items.map(parseProject);
+  return items.map((p) =>
+    parseProject({ ...p, content: p.description ?? "" }),
+  );
 }
 
 export async function getPublishedPosts() {
   return prisma.post.findMany({
     where: { published: true },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      excerpt: true,
+      coverImage: true,
+      tag: true,
+      publishedAt: true,
+      readTime: true,
+      author: true,
+    },
     orderBy: { publishedAt: "desc" },
   });
 }
@@ -64,6 +143,15 @@ export async function getPublishedPosts() {
 export async function getLatestPosts(limit = 3) {
   return prisma.post.findMany({
     where: { published: true },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      excerpt: true,
+      coverImage: true,
+      tag: true,
+      publishedAt: true,
+    },
     orderBy: { publishedAt: "desc" },
     take: limit,
   });

@@ -1,38 +1,43 @@
 import { BlogPreview } from "@/components/home/BlogPreview";
+import { Capabilities } from "@/components/home/Capabilities";
 import { CtaSection } from "@/components/home/CtaSection";
 import { FeaturedProjects } from "@/components/home/FeaturedProjects";
 import { Hero } from "@/components/home/Hero";
-import { Process } from "@/components/home/Process";
-import { Services } from "@/components/home/Services";
 import { TrustedMarquee } from "@/components/home/TrustedMarquee";
 import {
   getFeaturedProjects,
+  getHomeServices,
   getLatestPosts,
-  getPublishedServices,
+  getPublishedProjects,
 } from "@/lib/queries";
 
 export default async function HomePage() {
-  const [services, projects, posts] = await Promise.all([
-    getPublishedServices(),
+  const [services, featured, allProjects, posts] = await Promise.all([
+    getHomeServices(),
     getFeaturedProjects(),
+    getPublishedProjects(),
     getLatestPosts(3),
   ]);
 
+  const bands = services.slice(0, 3).map((s) => ({
+    id: s.id,
+    title: s.title,
+    description: s.description ?? "",
+    slug: s.slug,
+  }));
+
   return (
     <>
-      <Hero />
-      <TrustedMarquee />
-      <Services
-        items={services.map((s) => ({
-          id: s.id,
-          title: s.title,
-          description: s.description ?? "",
-          icon: s.icon ?? "◈",
-          slug: s.slug,
+      <Hero bands={bands} visualImage={featured[0]?.coverImage} />
+      <TrustedMarquee
+        projects={allProjects.map((p) => ({
+          title: p.title,
+          slug: p.slug,
         }))}
       />
+      <Capabilities />
       <FeaturedProjects
-        items={projects.map((p) => ({
+        items={featured.map((p) => ({
           id: p.id,
           title: p.title,
           category: p.category,
@@ -42,7 +47,6 @@ export default async function HomePage() {
           color: p.color,
         }))}
       />
-      <Process />
       <BlogPreview items={posts} />
       <CtaSection />
     </>

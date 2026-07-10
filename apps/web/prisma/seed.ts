@@ -5,13 +5,37 @@ import { posts, projects, services, siteConfig } from "../lib/data";
 const prisma = new PrismaClient();
 
 async function main() {
-  const passwordHash = await bcrypt.hash("admin123", 12);
+  const email =
+    process.env.SEED_ADMIN_EMAIL?.trim().toLowerCase() ||
+    "admin@sergioagency.com";
+  const password = process.env.SEED_ADMIN_PASSWORD;
+  const weakPasswords = new Set([
+    "admin123",
+    "password",
+    "12345678",
+    "changeme",
+    "admin",
+  ]);
+
+  if (!password || password.length < 12) {
+    throw new Error(
+      "Set SEED_ADMIN_PASSWORD (min 12 chars) before seeding. Example: SEED_ADMIN_PASSWORD='...' npx prisma db seed",
+    );
+  }
+  if (weakPasswords.has(password.toLowerCase())) {
+    throw new Error("SEED_ADMIN_PASSWORD is too weak. Choose a stronger password.");
+  }
+
+  const passwordHash = await bcrypt.hash(password, 12);
 
   await prisma.user.upsert({
-    where: { email: "admin@sergioagency.com" },
-    update: {},
+    where: { email },
+    update: {
+      passwordHash,
+      role: "ADMIN",
+    },
     create: {
-      email: "admin@sergioagency.com",
+      email,
       name: "Admin",
       passwordHash,
       role: "ADMIN",
@@ -20,7 +44,13 @@ async function main() {
 
   await prisma.siteSettings.upsert({
     where: { id: "default" },
-    update: {},
+    update: {
+      siteName: siteConfig.name,
+      tagline: siteConfig.tagline,
+      email: siteConfig.email,
+      phone: siteConfig.phone,
+      address: siteConfig.address,
+    },
     create: {
       id: "default",
       siteName: siteConfig.name,
@@ -138,7 +168,7 @@ async function main() {
   }
 
   console.log("Seed completed.");
-  console.log("Admin login: admin@sergioagency.com / admin123");
+  console.log(`Admin login: ${email} (password from SEED_ADMIN_PASSWORD)`);
 }
 
 main()
