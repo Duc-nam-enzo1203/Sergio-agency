@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
-import { requireAdmin } from "@/lib/api-auth";
+import { requireStaff } from "@/lib/api-auth";
 import { toJson } from "@/lib/db-utils";
 import { prisma } from "@/lib/prisma";
 import { projectSchema } from "@/lib/validations";
 
 export async function GET() {
-  const auth = await requireAdmin();
+  const auth = await requireStaff();
   if ("error" in auth) return auth.error;
 
   const projects = await prisma.project.findMany({
@@ -16,7 +16,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const auth = await requireAdmin();
+  const auth = await requireStaff();
   if ("error" in auth) return auth.error;
 
   try {

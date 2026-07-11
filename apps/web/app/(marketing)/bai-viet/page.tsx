@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
 import { CtaSection } from "@/components/home/CtaSection";
+import { PostList } from "@/components/blog/PostList";
 import { AnimateOnScroll } from "@/components/ui/AnimateOnScroll";
-import { PageHero } from "@/components/ui/PageHero";
+import { Button } from "@/components/ui/Button";
 import { getPublishedPosts } from "@/lib/queries";
 
 export const metadata: Metadata = {
@@ -11,90 +10,79 @@ export const metadata: Metadata = {
   description: "Kiến thức về thiết kế web, landing page và digital marketing.",
 };
 
-function formatDate(date: Date | null) {
-  if (!date) return "";
-  return new Intl.DateTimeFormat("vi-VN").format(date);
-}
-
 export default async function BlogPage() {
   const posts = await getPublishedPosts();
+  const tags = new Set(posts.map((p) => p.tag).filter(Boolean) as string[]);
 
   return (
     <>
-      <PageHero
-        eyebrow="Blog"
-        title="Kiến thức & xu hướng"
-        description="Chia sẻ kinh nghiệm thiết kế web, landing page và các xu hướng digital mới nhất."
-      />
+      <section className="relative overflow-hidden pt-28 pb-16 sm:pt-36 sm:pb-24">
+        <div aria-hidden className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_50%_at_15%_-10%,rgba(17,17,17,0.05),transparent_55%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_40%_at_100%_10%,rgba(243,238,230,0.95),transparent_50%)]" />
+          <div className="absolute inset-x-0 bottom-0 h-px bg-ink/10" />
+        </div>
+
+        <div className="relative site-container">
+          <div className="grid gap-12 lg:grid-cols-[1.25fr_0.75fr] lg:items-end lg:gap-16">
+            <AnimateOnScroll>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-ink/40">
+                Insights
+              </p>
+              <h1 className="font-display mt-5 max-w-[11ch] text-[clamp(2.75rem,8vw,5.5rem)] font-semibold leading-[0.95] tracking-[-0.04em] text-ink">
+                Bài viết
+                <span className="mt-2 block text-ink/35">& kiến thức.</span>
+              </h1>
+              <p className="mt-6 max-w-xl text-base leading-relaxed text-ink/55 sm:text-lg">
+                Kinh nghiệm thiết kế web, landing page, branding và các xu hướng
+                digital giúp thương hiệu tăng trưởng.
+              </p>
+            </AnimateOnScroll>
+
+            <AnimateOnScroll delay={0.1}>
+              <div className="flex flex-col gap-8 border-t border-ink/10 pt-8 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-12">
+                <dl className="grid grid-cols-2 gap-6">
+                  <div>
+                    <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-ink/40">
+                      Bài viết
+                    </dt>
+                    <dd className="font-display mt-2 text-3xl font-semibold tracking-tight text-ink">
+                      {String(posts.length).padStart(2, "0")}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-ink/40">
+                      Chủ đề
+                    </dt>
+                    <dd className="font-display mt-2 text-3xl font-semibold tracking-tight text-ink">
+                      {String(tags.size).padStart(2, "0")}
+                    </dd>
+                  </div>
+                </dl>
+                <Button href="/lien-he" variant="secondary">
+                  Đặt lịch tư vấn
+                </Button>
+              </div>
+            </AnimateOnScroll>
+          </div>
+        </div>
+      </section>
 
       <section className="pb-24 sm:pb-32">
         <div className="site-container">
-          <div className="grid gap-6 sm:grid-cols-2">
-            {posts.map((post, i) => (
-              <AnimateOnScroll
-                key={post.id}
-                delay={i * 0.06}
-                className={i === 0 ? "sm:col-span-2" : ""}
-              >
-                <Link
-                  href={`/bai-viet/${post.slug}`}
-                  className={`group flex h-full overflow-hidden rounded-[1.75rem] bg-ink/[0.03] p-1.5 ring-1 ring-ink/5 transition-all duration-500 hover:ring-ink/10 ${
-                    i === 0 ? "sm:flex-row" : "flex-col"
-                  }`}
-                >
-                  {post.coverImage && (
-                    <div
-                      className={`relative overflow-hidden rounded-[calc(1.75rem-0.375rem)] ${
-                        i === 0
-                          ? "aspect-[16/10] sm:aspect-auto sm:min-h-[280px] sm:w-1/2"
-                          : "aspect-[16/10]"
-                      }`}
-                    >
-                      <Image
-                        src={post.coverImage}
-                        alt={post.title}
-                        fill
-                        className="object-cover transition-transform duration-700 group-hover:scale-105"
-                        sizes={
-                          i === 0
-                            ? "(max-width: 640px) 100vw, 50vw"
-                            : "(max-width: 768px) 100vw, 50vw"
-                        }
-                      />
-                    </div>
-                  )}
-                  <div
-                    className={`flex flex-col justify-center p-6 ${
-                      i === 0 ? "sm:w-1/2 sm:p-8" : ""
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 text-xs text-ink/50">
-                      {post.tag && (
-                        <span className="rounded-full bg-ink/5 px-2.5 py-0.5 font-medium text-ink/60">
-                          {post.tag}
-                        </span>
-                      )}
-                      <time>{formatDate(post.publishedAt)}</time>
-                      {post.readTime && <span>· {post.readTime}</span>}
-                    </div>
-                    <h2
-                      className={`mt-3 font-display font-semibold leading-snug text-ink transition-colors group-hover:text-ink/80 ${
-                        i === 0 ? "text-2xl sm:text-3xl" : "text-xl"
-                      }`}
-                    >
-                      {post.title}
-                    </h2>
-                    <p className="mt-3 flex-1 text-sm leading-relaxed text-ink/60 sm:text-base">
-                      {post.excerpt}
-                    </p>
-                    <span className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-ink/70 transition-colors group-hover:text-ink">
-                      Đọc thêm →
-                    </span>
-                  </div>
-                </Link>
-              </AnimateOnScroll>
-            ))}
-          </div>
+          <PostList
+            posts={posts.map((p) => ({
+              id: p.id,
+              slug: p.slug,
+              title: p.title,
+              excerpt: p.excerpt,
+              coverImage: p.coverImage,
+              tag: p.tag,
+              publishedAt: p.publishedAt,
+              readTime: p.readTime,
+              author: p.author,
+            }))}
+          />
         </div>
       </section>
 

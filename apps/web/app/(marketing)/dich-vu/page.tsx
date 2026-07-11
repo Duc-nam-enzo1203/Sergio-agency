@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { CtaSection } from "@/components/home/CtaSection";
+import { ServiceCatalog } from "@/components/services/ServiceCatalog";
+import { ServicesProcess } from "@/components/services/ServicesProcess";
 import { AnimateOnScroll } from "@/components/ui/AnimateOnScroll";
-import { PageHero } from "@/components/ui/PageHero";
+import { Button } from "@/components/ui/Button";
 import { getPublishedServices } from "@/lib/queries";
 
 export const metadata: Metadata = {
@@ -16,61 +17,89 @@ export default async function ServicesPage() {
 
   return (
     <>
-      <PageHero
-        eyebrow="Dịch vụ"
-        title="Giải pháp số toàn diện"
-        description="Từ ý tưởng đến sản phẩm hoàn chỉnh — chúng tôi đồng hành cùng bạn ở mọi giai đoạn phát triển digital."
-      />
+      <section className="relative overflow-hidden pt-28 pb-16 sm:pt-36 sm:pb-24">
+        <div aria-hidden className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_10%_-10%,rgba(17,17,17,0.06),transparent_55%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_90%_20%,rgba(232,224,212,0.9),transparent_50%)]" />
+          <div className="absolute inset-x-0 bottom-0 h-px bg-ink/10" />
+        </div>
 
-      <section className="pb-24 sm:pb-32">
-        <div className="site-container">
-          <div className="grid gap-6 sm:grid-cols-2">
-            {services.map((service, i) => (
-              <AnimateOnScroll key={service.id} delay={i * 0.08}>
-                <Link
-                  href={`/dich-vu/${service.slug}`}
-                  className="group flex h-full flex-col rounded-[1.75rem] bg-ink/[0.03] p-1.5 ring-1 ring-ink/5 transition-all duration-500 hover:ring-ink/10"
-                >
-                  <div className="flex h-full flex-col rounded-[calc(1.75rem-0.375rem)] bg-cream p-8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.8)] transition-transform duration-500 group-hover:-translate-y-1">
-                    <span className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500/10 to-teal-500/10 text-2xl text-ink/70">
-                      {service.icon}
-                    </span>
-                    <h2 className="font-display text-2xl font-semibold text-ink">
-                      {service.title}
-                    </h2>
-                    <p className="mt-3 flex-1 text-sm leading-relaxed text-ink/60 sm:text-base">
-                      {service.description}
-                    </p>
-                    <ul className="mt-6 space-y-2">
-                      {service.features.slice(0, 3).map((f) => (
-                        <li
-                          key={f}
-                          className="flex items-start gap-2 text-sm text-ink/70"
-                        >
-                          <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-ink/40" />
-                          {f}
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="mt-8 flex items-center justify-between border-t border-ink/10 pt-6">
-                      <span className="text-sm text-ink/50">
-                        Từ{" "}
-                        <strong className="font-semibold text-ink">
-                          {service.priceFrom}
-                        </strong>
-                      </span>
-                      <span className="inline-flex items-center gap-2 text-sm font-medium text-ink/70 transition-colors group-hover:text-ink">
-                        Chi tiết →
-                      </span>
-                    </div>
+        <div className="relative site-container">
+          <div className="grid gap-12 lg:grid-cols-[1.2fr_0.8fr] lg:items-end lg:gap-16">
+            <AnimateOnScroll>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-ink/40">
+                Services
+              </p>
+              <h1 className="font-display mt-5 max-w-[11ch] text-[clamp(2.75rem,8vw,5.5rem)] font-semibold leading-[0.95] tracking-[-0.04em] text-ink">
+                Sergio Agency
+                <span className="mt-2 block text-ink/35">dịch vụ số.</span>
+              </h1>
+              <p className="mt-6 max-w-xl text-base leading-relaxed text-ink/55 sm:text-lg">
+                Từ website doanh nghiệp đến landing chuyển đổi, branding và bảo
+                trì — một studio đồng hành xuyên suốt vòng đời sản phẩm digital.
+              </p>
+            </AnimateOnScroll>
+
+            <AnimateOnScroll delay={0.1}>
+              <div className="flex flex-col gap-8 border-t border-ink/10 pt-8 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-12">
+                <dl className="grid grid-cols-2 gap-6">
+                  <div>
+                    <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-ink/40">
+                      Dịch vụ
+                    </dt>
+                    <dd className="font-display mt-2 text-3xl font-semibold tracking-tight text-ink">
+                      {String(services.length).padStart(2, "0")}
+                    </dd>
                   </div>
-                </Link>
-              </AnimateOnScroll>
-            ))}
+                  <div>
+                    <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-ink/40">
+                      Phản hồi
+                    </dt>
+                    <dd className="font-display mt-2 text-3xl font-semibold tracking-tight text-ink">
+                      24h
+                    </dd>
+                  </div>
+                </dl>
+                <Button href="/lien-he">Nhận tư vấn miễn phí</Button>
+              </div>
+            </AnimateOnScroll>
           </div>
         </div>
       </section>
 
+      <section>
+        <div className="site-container pb-6 pt-2">
+          <AnimateOnScroll>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-ink/40">
+                  Catalog
+                </p>
+                <h2 className="font-display mt-3 text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+                  Chọn hướng đi phù hợp.
+                </h2>
+              </div>
+              <p className="max-w-sm text-sm leading-relaxed text-ink/50">
+                Hover từng panel để khám phá — chạm để xem đầy đủ phạm vi và quy
+                trình.
+              </p>
+            </div>
+          </AnimateOnScroll>
+        </div>
+        <ServiceCatalog
+          items={services.map((s) => ({
+            id: s.id,
+            slug: s.slug,
+            title: s.title,
+            description: s.description,
+            priceFrom: s.priceFrom,
+            features: s.features,
+            icon: s.icon,
+          }))}
+        />
+      </section>
+
+      <ServicesProcess />
       <CtaSection />
     </>
   );

@@ -2,17 +2,22 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 const links = [
-  { href: "/dashboard", label: "Tổng quan", icon: "◉" },
-  { href: "/dashboard/du-an", label: "Dự án", icon: "◈" },
-  { href: "/dashboard/bai-viet", label: "Bài viết", icon: "◇" },
-  { href: "/dashboard/settings", label: "Settings", icon: "◎" },
+  { href: "/dashboard", label: "Tổng quan", icon: "◉", roles: ["ADMIN", "EDITOR"] },
+  { href: "/dashboard/du-an", label: "Dự án", icon: "◈", roles: ["ADMIN", "EDITOR"] },
+  { href: "/dashboard/bai-viet", label: "Bài viết", icon: "◇", roles: ["ADMIN", "EDITOR"] },
+  { href: "/dashboard/leads", label: "Leads", icon: "○", roles: ["ADMIN", "EDITOR"] },
+  { href: "/dashboard/settings", label: "Settings", icon: "◎", roles: ["ADMIN"] },
 ];
 
 export function DashboardSidebar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const role = String(session?.user?.role ?? "").toUpperCase();
+
+  const visible = links.filter((l) => l.roles.includes(role) || role === "ADMIN");
 
   return (
     <aside className="flex w-64 shrink-0 flex-col border-r border-white/10 bg-[#0a0a0a] text-white">
@@ -20,11 +25,13 @@ export function DashboardSidebar() {
         <Link href="/" className="font-display text-lg font-semibold">
           Sergio Agency
         </Link>
-        <p className="mt-1 text-xs text-white/40">Admin Dashboard</p>
+        <p className="mt-1 text-xs text-white/40">
+          {role === "ADMIN" ? "Admin Dashboard" : "Editor Dashboard"}
+        </p>
       </div>
 
       <nav className="flex-1 space-y-1 p-4">
-        {links.map((link) => {
+        {visible.map((link) => {
           const active =
             link.href === "/dashboard"
               ? pathname === "/dashboard"

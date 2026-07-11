@@ -1,3 +1,4 @@
+import { FloatingCTA } from "@/components/layout/FloatingCTA";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import { CustomCursor } from "@/components/providers/CustomCursor";
@@ -14,6 +15,7 @@ export default function MarketingLayout({
       <Navbar />
       <main>{children}</main>
       <Footer />
+      <FloatingCTA />
     </SmoothScroll>
   );
 }

@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import { NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/api-auth";
+import { requireStaff } from "@/lib/api-auth";
 import { getClientIp, rateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
@@ -63,12 +63,12 @@ async function saveLocal(buffer: Buffer, filename: string): Promise<string> {
 }
 
 export async function POST(request: Request) {
-  const auth = await requireAdmin();
+  const auth = await requireStaff();
   if ("error" in auth) return auth.error;
 
   const ip = getClientIp(request);
   const userId = auth.session.user.id ?? "unknown";
-  const limited = rateLimit(`upload:${userId}:${ip}`, 20, 60_000);
+  const limited = await rateLimit(`upload:${userId}:${ip}`, 20, 60_000);
   if (!limited.success) return rateLimitResponse(limited.resetAt);
 
   try {

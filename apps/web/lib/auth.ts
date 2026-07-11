@@ -3,8 +3,9 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { authConfig } from "@/lib/auth.config";
 import { prisma } from "@/lib/prisma";
-import { rateLimit } from "@/lib/rate-limit";
+import { getClientIp, rateLimit } from "@/lib/rate-limit";
 import { sanitizeEmail } from "@/lib/sanitize";
+import { logSecurityEvent } from "@/lib/security-log";
 
 /** Valid bcrypt hash used only to keep failed-login timing consistent. */
 const DUMMY_HASH =
@@ -43,6 +44,19 @@ function assertAuthSecret() {
 
 assertAuthSecret();
 
+function resolveIp(request: Request | undefined): string {
+  if (!request) return "unknown";
+  try {
+    return getClientIp(request);
+  } catch {
+    return (
+      request.headers?.get?.("x-vercel-forwarded-for")?.split(",")[0]?.trim() ||
+      request.headers?.get?.("x-real-ip") ||
+      "unknown"
+    );
+  }
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   trustHost: true,
@@ -72,6 +86,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           });
           if (!dbUser) {
             token.role = "REVOKED";
+            void logSecurityEvent({
+              type: "auth_revoked",
+              reason: "user_missing",
+              meta: { userId: token.id },
+            });
             return token;
           }
           token.role = dbUser.role;
@@ -96,30 +115,76 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         const email = sanitizeEmail(String(credentials.email));
         const password = String(credentials.password);
+        const ip = resolveIp(request);
 
         if (!email || password.length < 1 || password.length > 128) return null;
 
-        const emailLimited = rateLimit(`login:email:${email}`, 8, 15 * 60_000);
-        if (!emailLimited.success) return null;
+        const emailLimited = await rateLimit(
+          `login:email:${email}`,
+          8,
+          15 * 60_000,
+        );
+        if (!emailLimited.success) {
+          void logSecurityEvent({
+            type: "login_rate_limited",
+            email,
+            ip,
+            reason: "email_window",
+          });
+          return null;
+        }
 
-        const ip =
-          request?.headers?.get?.("x-vercel-forwarded-for")?.split(",")[0]?.trim() ||
-          request?.headers?.get?.("x-real-ip") ||
-          "unknown";
-        const ipLimited = rateLimit(`login:ip:${ip}`, 30, 15 * 60_000);
-        if (!ipLimited.success) return null;
+        const ipLimited = await rateLimit(`login:ip:${ip}`, 30, 15 * 60_000);
+        if (!ipLimited.success) {
+          void logSecurityEvent({
+            type: "login_rate_limited",
+            email,
+            ip,
+            reason: "ip_window",
+          });
+          return null;
+        }
 
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user) {
           await bcrypt.compare(password, DUMMY_HASH);
+          void logSecurityEvent({
+            type: "login_failure",
+            email,
+            ip,
+            reason: "unknown_user",
+          });
           return null;
         }
 
         const valid = await bcrypt.compare(password, user.passwordHash);
-        if (!valid) return null;
+        if (!valid) {
+          void logSecurityEvent({
+            type: "login_failure",
+            email,
+            ip,
+            reason: "bad_password",
+          });
+          return null;
+        }
 
         const role = user.role?.toUpperCase();
-        if (role !== "ADMIN" && role !== "EDITOR") return null;
+        if (role !== "ADMIN" && role !== "EDITOR") {
+          void logSecurityEvent({
+            type: "login_failure",
+            email,
+            ip,
+            reason: "role_denied",
+          });
+          return null;
+        }
+
+        void logSecurityEvent({
+          type: "login_success",
+          email,
+          ip,
+          meta: { role: user.role },
+        });
 
         return {
           id: user.id,

@@ -6,11 +6,20 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { navLinks, siteConfig } from "@/lib/data";
 
+function isDarkHeroPath(pathname: string) {
+  return (
+    /^\/du-an\/[^/]+\/?$/.test(pathname) ||
+    /^\/dich-vu\/[^/]+\/?$/.test(pathname)
+  );
+}
+
 export function Navbar() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const prefersReducedMotion = useReducedMotion();
+  const darkHero = isDarkHeroPath(pathname);
+  const lightNav = darkHero && !scrolled && !menuOpen;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -18,6 +27,10 @@ export function Navbar() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -33,12 +46,16 @@ export function Navbar() {
           className={`site-container flex items-center justify-between rounded-full px-4 py-2.5 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] sm:px-6 ${
             scrolled || menuOpen
               ? "bg-cream/80 shadow-[0_8px_32px_rgba(17,17,17,0.06)] backdrop-blur-xl ring-1 ring-ink/5"
-              : "bg-transparent"
+              : lightNav
+                ? "bg-cream/10 ring-1 ring-cream/15 backdrop-blur-md"
+                : "bg-transparent"
           }`}
         >
           <Link
             href="/"
-            className="font-display text-lg font-semibold tracking-tight text-ink"
+            className={`font-display text-lg font-semibold tracking-tight transition-colors duration-500 ${
+              lightNav ? "text-cream" : "text-ink"
+            }`}
           >
             {siteConfig.name}
           </Link>
@@ -52,8 +69,12 @@ export function Navbar() {
                     href={link.href}
                     className={`rounded-full px-4 py-2 text-sm transition-colors duration-300 ${
                       active
-                        ? "bg-ink text-cream"
-                        : "text-ink/70 hover:bg-ink/5 hover:text-ink"
+                        ? lightNav
+                          ? "bg-cream text-ink"
+                          : "bg-ink text-cream"
+                        : lightNav
+                          ? "text-cream/70 hover:bg-cream/10 hover:text-cream"
+                          : "text-ink/70 hover:bg-ink/5 hover:text-ink"
                     }`}
                   >
                     {link.label}
@@ -66,13 +87,21 @@ export function Navbar() {
           <div className="hidden items-center gap-3 md:flex">
             <Link
               href="/dang-nhap"
-              className="text-sm text-ink/60 transition-colors hover:text-ink"
+              className={`text-sm transition-colors ${
+                lightNav
+                  ? "text-cream/60 hover:text-cream"
+                  : "text-ink/60 hover:text-ink"
+              }`}
             >
               Đăng nhập
             </Link>
             <Link
               href="/lien-he"
-              className="rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-cream transition-all duration-500 hover:bg-ink/90 active:scale-[0.98]"
+              className={`rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-500 active:scale-[0.98] ${
+                lightNav
+                  ? "bg-cream text-ink hover:bg-cream/90"
+                  : "bg-ink text-cream hover:bg-ink/90"
+              }`}
             >
               Bắt đầu dự án
             </Link>
@@ -83,23 +112,25 @@ export function Navbar() {
             aria-label={menuOpen ? "Đóng menu" : "Mở menu"}
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen(!menuOpen)}
-            className="relative flex h-10 w-10 items-center justify-center rounded-full bg-ink/5 md:hidden"
+            className={`relative flex h-10 w-10 items-center justify-center rounded-full md:hidden ${
+              lightNav ? "bg-cream/10" : "bg-ink/5"
+            }`}
           >
             <span className="sr-only">Menu</span>
             <span
-              className={`absolute h-0.5 w-5 bg-ink transition-all duration-500 ${
-                menuOpen ? "rotate-45" : "-translate-y-1.5"
-              }`}
+              className={`absolute h-0.5 w-5 transition-all duration-500 ${
+                lightNav ? "bg-cream" : "bg-ink"
+              } ${menuOpen ? "rotate-45" : "-translate-y-1.5"}`}
             />
             <span
-              className={`absolute h-0.5 w-5 bg-ink transition-all duration-500 ${
-                menuOpen ? "opacity-0" : ""
-              }`}
+              className={`absolute h-0.5 w-5 transition-all duration-500 ${
+                lightNav ? "bg-cream" : "bg-ink"
+              } ${menuOpen ? "opacity-0" : ""}`}
             />
             <span
-              className={`absolute h-0.5 w-5 bg-ink transition-all duration-500 ${
-                menuOpen ? "-rotate-45" : "translate-y-1.5"
-              }`}
+              className={`absolute h-0.5 w-5 transition-all duration-500 ${
+                lightNav ? "bg-cream" : "bg-ink"
+              } ${menuOpen ? "-rotate-45" : "translate-y-1.5"}`}
             />
           </button>
         </nav>

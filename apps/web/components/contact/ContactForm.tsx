@@ -14,6 +14,12 @@ const budgetOptions = [
   "Chưa xác định",
 ];
 
+const fieldClass =
+  "w-full border-0 border-b border-ink/15 bg-transparent px-0 py-3 text-sm text-ink transition-colors placeholder:text-ink/35 focus:border-ink focus:outline-none focus:ring-0";
+
+const labelClass =
+  "mb-1 block text-[11px] font-semibold uppercase tracking-[0.16em] text-ink/40";
+
 export function ContactForm() {
   const [state, setState] = useState<FormState>("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -38,13 +44,14 @@ export function ContactForm() {
       if (!res.ok) {
         setErrorMsg(
           (data as { error?: string }).error ??
-            "Không thể gửi tin nhắn. Vui lòng thử lại."
+            "Không thể gửi tin nhắn. Vui lòng thử lại.",
         );
         setState("error");
         return;
       }
 
       setState("success");
+      e.currentTarget.reset();
     } catch {
       setErrorMsg("Lỗi kết nối. Vui lòng thử lại.");
       setState("error");
@@ -54,25 +61,25 @@ export function ContactForm() {
   if (state === "success") {
     return (
       <AnimateOnScroll>
-        <div className="rounded-[1.75rem] bg-ink/[0.03] p-1.5 ring-1 ring-ink/5">
-          <div className="rounded-[calc(1.75rem-0.375rem)] bg-cream p-10 text-center">
-            <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-green-500/10 text-2xl text-green-600">
-              ✓
-            </span>
-            <h3 className="mt-4 font-display text-xl font-semibold text-ink">
-              Đã gửi thành công!
-            </h3>
-            <p className="mt-2 text-sm text-ink/60">
-              Cảm ơn bạn đã liên hệ. Chúng tôi sẽ phản hồi trong vòng 24 giờ.
-            </p>
-            <button
-              type="button"
-              onClick={() => setState("idle")}
-              className="mt-6 text-sm font-medium text-ink/70 underline hover:text-ink"
-            >
-              Gửi tin nhắn khác
-            </button>
-          </div>
+        <div className="border-t border-ink/10 py-12 sm:py-16">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-ink/40">
+            Sent
+          </p>
+          <h3 className="font-display mt-4 text-3xl font-semibold tracking-tight text-ink">
+            Đã nhận được tin nhắn.
+          </h3>
+          <p className="mt-4 max-w-md text-base leading-relaxed text-ink/55">
+            Cảm ơn bạn đã liên hệ Sergio Agency. Chúng tôi sẽ phản hồi trong vòng
+            24 giờ làm việc.
+          </p>
+          <button
+            type="button"
+            onClick={() => setState("idle")}
+            className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-ink transition-all hover:gap-3"
+          >
+            Gửi tin nhắn khác
+            <span aria-hidden>→</span>
+          </button>
         </div>
       </AnimateOnScroll>
     );
@@ -82,35 +89,48 @@ export function ContactForm() {
     <AnimateOnScroll>
       <form
         onSubmit={handleSubmit}
-        className="rounded-[1.75rem] bg-ink/[0.03] p-1.5 ring-1 ring-ink/5"
+        className="relative border-t border-ink/10 pt-10 sm:pt-12"
         autoComplete="on"
       >
-        <div className="space-y-5 rounded-[calc(1.75rem-0.375rem)] bg-cream p-6 sm:p-8">
-          {/* Honeypot — hidden from users, bots often fill it */}
-          <div
-            aria-hidden="true"
-            className="absolute -left-[9999px] h-0 w-0 overflow-hidden opacity-0"
-          >
-            <label htmlFor="website">Website</label>
-            <input
-              id="website"
-              name="website"
-              type="text"
-              tabIndex={-1}
-              autoComplete="off"
-            />
-          </div>
+        <div
+          aria-hidden="true"
+          className="absolute -left-[9999px] h-0 w-0 overflow-hidden opacity-0"
+        >
+          <label htmlFor="website">Website</label>
+          <input
+            id="website"
+            name="website"
+            type="text"
+            tabIndex={-1}
+            autoComplete="off"
+          />
+        </div>
 
-          {state === "error" && errorMsg && (
-            <p className="rounded-xl bg-red-500/10 px-4 py-3 text-sm text-red-600">
-              {errorMsg}
+        <div className="mb-10 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-ink/40">
+              Brief
             </p>
-          )}
+            <h2 className="font-display mt-3 text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+              Kể chúng tôi nghe về dự án.
+            </h2>
+          </div>
+          <p className="max-w-xs text-sm leading-relaxed text-ink/45 sm:text-right">
+            Các trường có dấu * là bắt buộc.
+          </p>
+        </div>
 
-          <div className="grid gap-5 sm:grid-cols-2">
+        {state === "error" && errorMsg ? (
+          <p className="mb-8 border-l-2 border-red-500/60 bg-red-500/[0.06] px-4 py-3 text-sm text-red-700">
+            {errorMsg}
+          </p>
+        ) : null}
+
+        <div className="space-y-8">
+          <div className="grid gap-8 sm:grid-cols-2">
             <div>
-              <label htmlFor="name" className="mb-2 block text-sm font-medium text-ink">
-                Họ và tên <span className="text-red-500">*</span>
+              <label htmlFor="name" className={labelClass}>
+                Họ và tên *
               </label>
               <input
                 id="name"
@@ -118,13 +138,13 @@ export function ContactForm() {
                 type="text"
                 required
                 maxLength={100}
-                className="w-full rounded-xl border-0 bg-ink/5 px-4 py-3 text-sm text-ink ring-1 ring-ink/10 transition-all placeholder:text-ink/40 focus:bg-cream focus:ring-2 focus:ring-ink/20 focus:outline-none"
+                className={fieldClass}
                 placeholder="Nguyễn Văn A"
               />
             </div>
             <div>
-              <label htmlFor="email" className="mb-2 block text-sm font-medium text-ink">
-                Email <span className="text-red-500">*</span>
+              <label htmlFor="email" className={labelClass}>
+                Email *
               </label>
               <input
                 id="email"
@@ -132,15 +152,15 @@ export function ContactForm() {
                 type="email"
                 required
                 maxLength={254}
-                className="w-full rounded-xl border-0 bg-ink/5 px-4 py-3 text-sm text-ink ring-1 ring-ink/10 transition-all placeholder:text-ink/40 focus:bg-cream focus:ring-2 focus:ring-ink/20 focus:outline-none"
+                className={fieldClass}
                 placeholder="email@company.com"
               />
             </div>
           </div>
 
-          <div className="grid gap-5 sm:grid-cols-2">
+          <div className="grid gap-8 sm:grid-cols-2">
             <div>
-              <label htmlFor="phone" className="mb-2 block text-sm font-medium text-ink">
+              <label htmlFor="phone" className={labelClass}>
                 Số điện thoại
               </label>
               <input
@@ -148,12 +168,12 @@ export function ContactForm() {
                 name="phone"
                 type="tel"
                 maxLength={50}
-                className="w-full rounded-xl border-0 bg-ink/5 px-4 py-3 text-sm text-ink ring-1 ring-ink/10 transition-all placeholder:text-ink/40 focus:bg-cream focus:ring-2 focus:ring-ink/20 focus:outline-none"
+                className={fieldClass}
                 placeholder="0901 234 567"
               />
             </div>
             <div>
-              <label htmlFor="company" className="mb-2 block text-sm font-medium text-ink">
+              <label htmlFor="company" className={labelClass}>
                 Công ty
               </label>
               <input
@@ -161,22 +181,18 @@ export function ContactForm() {
                 name="company"
                 type="text"
                 maxLength={200}
-                className="w-full rounded-xl border-0 bg-ink/5 px-4 py-3 text-sm text-ink ring-1 ring-ink/10 transition-all placeholder:text-ink/40 focus:bg-cream focus:ring-2 focus:ring-ink/20 focus:outline-none"
+                className={fieldClass}
                 placeholder="Tên công ty"
               />
             </div>
           </div>
 
-          <div className="grid gap-5 sm:grid-cols-2">
+          <div className="grid gap-8 sm:grid-cols-2">
             <div>
-              <label htmlFor="service" className="mb-2 block text-sm font-medium text-ink">
+              <label htmlFor="service" className={labelClass}>
                 Dịch vụ quan tâm
               </label>
-              <select
-                id="service"
-                name="service"
-                className="w-full rounded-xl border-0 bg-ink/5 px-4 py-3 text-sm text-ink ring-1 ring-ink/10 transition-all focus:bg-cream focus:ring-2 focus:ring-ink/20 focus:outline-none"
-              >
+              <select id="service" name="service" className={fieldClass}>
                 <option value="">Chọn dịch vụ</option>
                 {services.map((s) => (
                   <option key={s.id} value={s.slug}>
@@ -186,14 +202,10 @@ export function ContactForm() {
               </select>
             </div>
             <div>
-              <label htmlFor="budget" className="mb-2 block text-sm font-medium text-ink">
+              <label htmlFor="budget" className={labelClass}>
                 Ngân sách dự kiến
               </label>
-              <select
-                id="budget"
-                name="budget"
-                className="w-full rounded-xl border-0 bg-ink/5 px-4 py-3 text-sm text-ink ring-1 ring-ink/10 transition-all focus:bg-cream focus:ring-2 focus:ring-ink/20 focus:outline-none"
-              >
+              <select id="budget" name="budget" className={fieldClass}>
                 <option value="">Chọn ngân sách</option>
                 {budgetOptions.map((b) => (
                   <option key={b} value={b}>
@@ -205,8 +217,8 @@ export function ContactForm() {
           </div>
 
           <div>
-            <label htmlFor="message" className="mb-2 block text-sm font-medium text-ink">
-              Nội dung <span className="text-red-500">*</span>
+            <label htmlFor="message" className={labelClass}>
+              Nội dung *
             </label>
             <textarea
               id="message"
@@ -214,18 +226,24 @@ export function ContactForm() {
               required
               rows={5}
               maxLength={5000}
-              className="w-full resize-none rounded-xl border-0 bg-ink/5 px-4 py-3 text-sm text-ink ring-1 ring-ink/10 transition-all placeholder:text-ink/40 focus:bg-cream focus:ring-2 focus:ring-ink/20 focus:outline-none"
+              className={`${fieldClass} resize-none`}
               placeholder="Mô tả dự án, mục tiêu và yêu cầu của bạn..."
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={state === "submitting"}
-            className="w-full rounded-full bg-ink py-4 text-sm font-medium text-cream transition-all duration-500 hover:bg-ink/90 active:scale-[0.98] disabled:opacity-60 sm:w-auto sm:px-10"
-          >
-            {state === "submitting" ? "Đang gửi..." : "Gửi tin nhắn"}
-          </button>
+          <div className="flex flex-col gap-4 pt-2 sm:flex-row sm:items-center sm:justify-between">
+            <button
+              type="submit"
+              disabled={state === "submitting"}
+              className="inline-flex items-center justify-center gap-3 rounded-full bg-ink px-8 py-3.5 text-sm font-medium text-cream transition-all duration-500 hover:bg-ink/90 active:scale-[0.98] disabled:opacity-60"
+            >
+              {state === "submitting" ? "Đang gửi..." : "Gửi tin nhắn"}
+              {state !== "submitting" ? <span aria-hidden>→</span> : null}
+            </button>
+            <p className="text-sm text-ink/40">
+              Hoặc gọi trực tiếp — phản hồi trong 24h
+            </p>
+          </div>
         </div>
       </form>
     </AnimateOnScroll>

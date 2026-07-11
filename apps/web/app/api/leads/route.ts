@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/api-auth";
+import { requireStaff } from "@/lib/api-auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 const leadStatusSchema = z.enum(["NEW", "CONTACTED", "QUALIFIED", "CLOSED"]);
 
 export async function GET() {
-  const auth = await requireAdmin();
+  const auth = await requireStaff();
   if ("error" in auth) return auth.error;
 
   const leads = await prisma.lead.findMany({
@@ -16,7 +16,7 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
-  const auth = await requireAdmin();
+  const auth = await requireStaff();
   if ("error" in auth) return auth.error;
 
   try {

@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
-import { requireAdmin } from "@/lib/api-auth";
+import { requireStaff } from "@/lib/api-auth";
 import { prisma } from "@/lib/prisma";
 import { postSchema } from "@/lib/validations";
 
 export async function GET() {
-  const auth = await requireAdmin();
+  const auth = await requireStaff();
   if ("error" in auth) return auth.error;
 
   const posts = await prisma.post.findMany({
@@ -15,7 +15,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const auth = await requireAdmin();
+  const auth = await requireStaff();
   if ("error" in auth) return auth.error;
 
   try {

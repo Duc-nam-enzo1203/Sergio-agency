@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
-import { requireAdmin } from "@/lib/api-auth";
+import { requireStaff } from "@/lib/api-auth";
 import { toJson } from "@/lib/db-utils";
 import { prisma } from "@/lib/prisma";
 import { projectSchema } from "@/lib/validations";
@@ -8,7 +8,7 @@ import { projectSchema } from "@/lib/validations";
 type Props = { params: Promise<{ id: string }> };
 
 export async function GET(_request: Request, { params }: Props) {
-  const auth = await requireAdmin();
+  const auth = await requireStaff();
   if ("error" in auth) return auth.error;
 
   const { id } = await params;
@@ -18,7 +18,7 @@ export async function GET(_request: Request, { params }: Props) {
 }
 
 export async function PATCH(request: Request, { params }: Props) {
-  const auth = await requireAdmin();
+  const auth = await requireStaff();
   if ("error" in auth) return auth.error;
 
   const { id } = await params;
@@ -67,7 +67,7 @@ export async function PATCH(request: Request, { params }: Props) {
 }
 
 export async function DELETE(_request: Request, { params }: Props) {
-  const auth = await requireAdmin();
+  const auth = await requireStaff();
   if ("error" in auth) return auth.error;
 
   const { id } = await params;

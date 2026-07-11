@@ -30,19 +30,54 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 function renderMarkdown(content: string) {
   const blocks = content.split("\n\n");
   return blocks.map((block, i) => {
-    if (block.startsWith("## ")) {
+    const trimmed = block.trim();
+    if (!trimmed) return null;
+
+    if (trimmed.startsWith("## ")) {
       return (
         <h2
           key={i}
-          className="font-display mt-10 mb-4 text-2xl font-semibold text-ink"
+          className="font-display mt-12 mb-4 text-2xl font-semibold tracking-tight text-ink sm:text-3xl"
         >
-          {block.replace("## ", "")}
+          {trimmed.replace(/^##\s+/, "")}
         </h2>
       );
     }
+
+    if (trimmed.startsWith("### ")) {
+      return (
+        <h3
+          key={i}
+          className="font-display mt-8 mb-3 text-xl font-semibold text-ink"
+        >
+          {trimmed.replace(/^###\s+/, "")}
+        </h3>
+      );
+    }
+
+    if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+      const items = trimmed.split("\n").filter((l) => /^[-*]\s+/.test(l));
+      return (
+        <ul key={i} className="my-6 space-y-3">
+          {items.map((item) => (
+            <li
+              key={item}
+              className="flex items-start gap-3 text-base leading-relaxed text-ink/70"
+            >
+              <span
+                aria-hidden
+                className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-ink/40"
+              />
+              {item.replace(/^[-*]\s+/, "")}
+            </li>
+          ))}
+        </ul>
+      );
+    }
+
     return (
-      <p key={i} className="mb-4 text-base leading-relaxed text-ink/70">
-        {block}
+      <p key={i} className="mb-5 text-base leading-[1.75] text-ink/70 sm:text-lg">
+        {trimmed}
       </p>
     );
   });
@@ -50,7 +85,11 @@ function renderMarkdown(content: string) {
 
 function formatDate(date: Date | null) {
   if (!date) return "";
-  return new Intl.DateTimeFormat("vi-VN").format(date);
+  return new Intl.DateTimeFormat("vi-VN", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  }).format(date);
 }
 
 export default async function PostDetailPage({ params }: Props) {
@@ -58,87 +97,188 @@ export default async function PostDetailPage({ params }: Props) {
   const post = await getPostBySlug(slug);
   if (!post) notFound();
 
+  const all = await getPublishedPosts();
+  const index = Math.max(
+    0,
+    all.findIndex((p) => p.id === post.id),
+  );
+  const num = String(index + 1).padStart(2, "0");
   const related = await getRelatedPosts(slug);
+  const prev = all[(index - 1 + all.length) % all.length];
+  const next = all[(index + 1) % all.length];
 
   return (
     <>
-      <article className="pt-28 sm:pt-32">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6">
-          <AnimateOnScroll>
-            <Link
-              href="/bai-viet"
-              className="mb-6 inline-flex items-center gap-2 text-sm text-ink/50 transition-colors hover:text-ink"
-            >
-              ← Tất cả bài viết
-            </Link>
-            <div className="flex flex-wrap items-center gap-3 text-xs text-ink/50">
-              {post.tag && (
-                <span className="rounded-full bg-ink/5 px-2.5 py-0.5 font-medium text-ink/60">
-                  {post.tag}
-                </span>
-              )}
-              <time>{formatDate(post.publishedAt)}</time>
-              {post.readTime && <span>· {post.readTime}</span>}
-              {post.author && <span>· {post.author}</span>}
-            </div>
-            <h1 className="mt-4 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl lg:text-5xl">
-              {post.title}
-            </h1>
-            {post.excerpt && (
-              <p className="mt-4 text-lg leading-relaxed text-ink/60">
-                {post.excerpt}
-              </p>
-            )}
-          </AnimateOnScroll>
+      <article>
+        <section className="relative overflow-hidden pt-28 pb-12 sm:pt-36 sm:pb-16">
+          <div aria-hidden className="pointer-events-none absolute inset-0">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_80%_0%,rgba(243,238,230,0.9),transparent_55%)]" />
+          </div>
 
-          {post.coverImage && (
-            <AnimateOnScroll delay={0.1}>
-              <div className="relative mt-10 aspect-[16/9] overflow-hidden rounded-2xl ring-1 ring-ink/10">
-                <Image
-                  src={post.coverImage}
-                  alt={post.title}
-                  fill
-                  className="object-cover"
-                  priority
-                  sizes="(max-width: 768px) 100vw, 768px"
-                />
+          <div className="relative site-container">
+            <AnimateOnScroll>
+              <Link
+                href="/bai-viet"
+                className="inline-flex items-center gap-2 text-sm text-ink/45 transition-colors hover:text-ink"
+              >
+                ← Tất cả bài viết
+              </Link>
+
+              <div className="mt-8 flex flex-wrap items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-ink/40">
+                <span>{num}</span>
+                {post.tag ? (
+                  <>
+                    <span className="h-px w-6 bg-ink/20" />
+                    <span>{post.tag}</span>
+                  </>
+                ) : null}
+                {post.publishedAt ? (
+                  <>
+                    <span className="h-px w-6 bg-ink/20" />
+                    <time className="normal-case tracking-normal">
+                      {formatDate(post.publishedAt)}
+                    </time>
+                  </>
+                ) : null}
+                {post.readTime ? (
+                  <>
+                    <span className="h-px w-6 bg-ink/20" />
+                    <span>{post.readTime}</span>
+                  </>
+                ) : null}
               </div>
-            </AnimateOnScroll>
-          )}
 
-          <AnimateOnScroll delay={0.15}>
-            <div className="prose-custom mt-12 pb-16">
-              {renderMarkdown(post.content)}
+              <h1 className="font-display mt-5 max-w-[18ch] text-[clamp(2.25rem,6vw,4.25rem)] font-semibold leading-[1.02] tracking-[-0.04em] text-ink">
+                {post.title}
+              </h1>
+
+              {post.excerpt ? (
+                <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink/55 sm:text-xl">
+                  {post.excerpt}
+                </p>
+              ) : null}
+
+              {post.author ? (
+                <p className="mt-8 text-sm text-ink/45">
+                  Viết bởi{" "}
+                  <span className="font-medium text-ink/70">{post.author}</span>
+                </p>
+              ) : null}
+            </AnimateOnScroll>
+          </div>
+        </section>
+
+        {post.coverImage ? (
+          <div className="relative aspect-[16/10] w-full overflow-hidden bg-ink/5 sm:aspect-[21/9]">
+            <Image
+              src={post.coverImage}
+              alt={post.title}
+              fill
+              priority
+              className="object-cover"
+              sizes="100vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-cream via-transparent to-transparent opacity-40" />
+          </div>
+        ) : null}
+
+        <section className="bg-cream py-14 sm:py-20">
+          <div className="site-container">
+            <div className="mx-auto max-w-2xl">
+              <AnimateOnScroll>
+                <div className="border-t border-ink/10 pt-2">
+                  {renderMarkdown(post.content)}
+                </div>
+              </AnimateOnScroll>
             </div>
-          </AnimateOnScroll>
-        </div>
+          </div>
+        </section>
       </article>
 
       {related.length > 0 && (
-        <section className="border-t border-ink/10 bg-cream-dark/30 py-16">
-          <div className="mx-auto max-w-3xl px-4 sm:px-6">
-            <h2 className="font-display text-xl font-semibold text-ink">
-              Bài viết liên quan
-            </h2>
-            <div className="mt-6 space-y-4">
-              {related.map((p) => (
-                <Link
-                  key={p.id}
-                  href={`/bai-viet/${p.slug}`}
-                  className="group block rounded-2xl bg-cream p-5 ring-1 ring-ink/5 transition-all hover:ring-ink/10"
-                >
-                  {p.tag && (
-                    <span className="text-[10px] uppercase tracking-wider text-ink/50">
-                      {p.tag}
-                    </span>
-                  )}
-                  <h3 className="mt-1 font-display font-semibold text-ink group-hover:text-ink/80">
-                    {p.title}
-                  </h3>
-                  <p className="mt-1 text-sm text-ink/60">{p.excerpt}</p>
-                </Link>
+        <section className="border-t border-ink/10 bg-[#F3EEE6] py-20 sm:py-28">
+          <div className="site-container">
+            <AnimateOnScroll>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-ink/40">
+                Keep reading
+              </p>
+              <h2 className="font-display mt-3 text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+                Bài viết liên quan.
+              </h2>
+            </AnimateOnScroll>
+
+            <div className="mt-4 divide-y divide-ink/10 border-t border-ink/10">
+              {related.map((p, i) => (
+                <AnimateOnScroll key={p.id} delay={0.05 + i * 0.06}>
+                  <Link
+                    href={`/bai-viet/${p.slug}`}
+                    className="group grid items-center gap-6 py-8 sm:grid-cols-[180px_1fr] sm:gap-10 sm:py-10"
+                  >
+                    <div className="relative aspect-[16/10] overflow-hidden bg-ink/5 ring-1 ring-ink/10">
+                      {p.coverImage ? (
+                        <Image
+                          src={p.coverImage}
+                          alt={p.title}
+                          fill
+                          className="object-cover transition-transform duration-700 group-hover:scale-105"
+                          sizes="180px"
+                        />
+                      ) : null}
+                    </div>
+                    <div>
+                      {p.tag ? (
+                        <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink/40">
+                          {p.tag}
+                        </span>
+                      ) : null}
+                      <h3 className="font-display mt-2 text-xl font-semibold text-ink transition-transform duration-500 group-hover:translate-x-1 sm:text-2xl">
+                        {p.title}
+                      </h3>
+                      {p.excerpt ? (
+                        <p className="mt-2 max-w-lg text-sm leading-relaxed text-ink/55 line-clamp-2">
+                          {p.excerpt}
+                        </p>
+                      ) : null}
+                    </div>
+                  </Link>
+                </AnimateOnScroll>
               ))}
             </div>
+          </div>
+        </section>
+      )}
+
+      {(prev || next) && (
+        <section className="border-y border-ink/10 bg-cream">
+          <div className="site-container grid sm:grid-cols-2">
+            {prev && prev.id !== post.id ? (
+              <Link
+                href={`/bai-viet/${prev.slug}`}
+                className="group flex flex-col gap-2 border-b border-ink/10 py-10 pr-6 transition-colors hover:bg-ink/[0.02] sm:border-b-0 sm:border-r sm:py-12 sm:pr-10"
+              >
+                <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-ink/40">
+                  Trước
+                </span>
+                <span className="font-display text-xl font-semibold text-ink transition-transform duration-500 group-hover:-translate-x-1 sm:text-2xl">
+                  ← {prev.title}
+                </span>
+              </Link>
+            ) : (
+              <div />
+            )}
+            {next && next.id !== post.id ? (
+              <Link
+                href={`/bai-viet/${next.slug}`}
+                className="group flex flex-col items-start gap-2 py-10 transition-colors hover:bg-ink/[0.02] sm:items-end sm:py-12 sm:pl-10"
+              >
+                <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-ink/40">
+                  Tiếp theo
+                </span>
+                <span className="font-display text-xl font-semibold text-ink transition-transform duration-500 group-hover:translate-x-1 sm:text-2xl">
+                  {next.title} →
+                </span>
+              </Link>
+            ) : null}
           </div>
         </section>
       )}

@@ -93,3 +93,16 @@ model SiteSettings {
   socialLinks String @default("{}")
   seoDefaults String @default("{}")
 }
+
+model AuthEvent {
+  id        String   @id @default(cuid())
+  type      String
+  email     String?
+  ip        String?
+  reason    String?
+  meta      String?
+  createdAt DateTime @default(now())
+
+  @@index([type, createdAt])
+  @@index([email, createdAt])
+}

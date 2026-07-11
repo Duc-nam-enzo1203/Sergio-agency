@@ -13,7 +13,7 @@ import { contactSchema } from "@/lib/validations";
 export async function POST(request: Request) {
   try {
     const ip = getClientIp(request);
-    const limited = rateLimit(`contact:${ip}`, 5, 60_000);
+    const limited = await rateLimit(`contact:${ip}`, 5, 60_000);
     if (!limited.success) {
       return rateLimitResponse(limited.resetAt);
     }

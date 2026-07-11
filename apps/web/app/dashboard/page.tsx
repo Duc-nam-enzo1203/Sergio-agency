@@ -13,7 +13,7 @@ export default async function DashboardPage() {
     {
       label: "Leads mới",
       value: stats.leadsNew,
-      href: "/dashboard/settings",
+      href: "/dashboard/leads",
     },
   ];
 

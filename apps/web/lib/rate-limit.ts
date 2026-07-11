@@ -1,10 +1,5 @@
-type RateLimitEntry = {
-  count: number;
-  resetAt: number;
-};
-
-const store = new Map<string, RateLimitEntry>();
-const MAX_KEYS = 10_000;
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 
 export type RateLimitResult = {
   success: boolean;
@@ -12,33 +7,48 @@ export type RateLimitResult = {
   resetAt: number;
 };
 
-/**
- * In-memory rate limiter (per-process).
- * On multi-instance hosts (Vercel), prefer Redis/Upstash for global limits.
- * Login is also keyed by email so IP spoofing alone cannot bypass email caps.
- */
-export function rateLimit(
+type MemoryEntry = {
+  count: number;
+  resetAt: number;
+};
+
+const memoryStore = new Map<string, MemoryEntry>();
+const MAX_KEYS = 10_000;
+
+let redis: Redis | null = null;
+const limiters = new Map<string, Ratelimit>();
+
+function getRedis(): Redis | null {
+  const url = process.env.UPSTASH_REDIS_REST_URL?.trim();
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN?.trim();
+  if (!url || !token) return null;
+  if (!redis) {
+    redis = new Redis({ url, token });
+  }
+  return redis;
+}
+
+function memoryRateLimit(
   key: string,
   limit: number,
   windowMs: number,
 ): RateLimitResult {
   const now = Date.now();
 
-  if (store.size > MAX_KEYS) {
-    for (const [k, v] of store) {
-      if (now > v.resetAt) store.delete(k);
+  if (memoryStore.size > MAX_KEYS) {
+    for (const [k, v] of memoryStore) {
+      if (now > v.resetAt) memoryStore.delete(k);
     }
-    if (store.size > MAX_KEYS) {
-      const first = store.keys().next().value;
-      if (first) store.delete(first);
+    if (memoryStore.size > MAX_KEYS) {
+      const first = memoryStore.keys().next().value;
+      if (first) memoryStore.delete(first);
     }
   }
 
-  const entry = store.get(key);
-
+  const entry = memoryStore.get(key);
   if (!entry || now > entry.resetAt) {
     const resetAt = now + windowMs;
-    store.set(key, { count: 1, resetAt });
+    memoryStore.set(key, { count: 1, resetAt });
     return { success: true, remaining: limit - 1, resetAt };
   }
 
@@ -47,12 +57,56 @@ export function rateLimit(
   }
 
   entry.count += 1;
-  store.set(key, entry);
   return {
     success: true,
     remaining: limit - entry.count,
     resetAt: entry.resetAt,
   };
+}
+
+function getLimiter(limit: number, windowMs: number): Ratelimit | null {
+  const client = getRedis();
+  if (!client) return null;
+
+  const cacheKey = `${limit}:${windowMs}`;
+  let limiter = limiters.get(cacheKey);
+  if (!limiter) {
+    const windowSec = Math.max(1, Math.ceil(windowMs / 1000));
+    limiter = new Ratelimit({
+      redis: client,
+      limiter: Ratelimit.slidingWindow(limit, `${windowSec} s`),
+      prefix: "sergio-rl",
+      analytics: false,
+    });
+    limiters.set(cacheKey, limiter);
+  }
+  return limiter;
+}
+
+/**
+ * Distributed rate limit via Upstash when configured; otherwise in-memory fallback.
+ */
+export async function rateLimit(
+  key: string,
+  limit: number,
+  windowMs: number,
+): Promise<RateLimitResult> {
+  const limiter = getLimiter(limit, windowMs);
+  if (!limiter) {
+    return memoryRateLimit(key, limit, windowMs);
+  }
+
+  try {
+    const result = await limiter.limit(key);
+    return {
+      success: result.success,
+      remaining: result.remaining,
+      resetAt: result.reset,
+    };
+  } catch (err) {
+    console.error("[rate-limit] Upstash failed, using memory fallback", err);
+    return memoryRateLimit(key, limit, windowMs);
+  }
 }
 
 /**
