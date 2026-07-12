@@ -84,7 +84,7 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="bg-ink text-cream">
+      <section data-cursor="light" className="bg-ink text-cream">
         <div className="site-container">
           <div className="grid border-y border-cream/10 sm:grid-cols-2 lg:grid-cols-4">
             {channels.map((channel, i) => {

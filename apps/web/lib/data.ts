@@ -10,6 +10,7 @@ export const navLinks = [
   { href: "/", label: "Trang chủ" },
   { href: "/dich-vu", label: "Dịch vụ" },
   { href: "/du-an", label: "Dự án" },
+  { href: "/portfolio", label: "Portfolio" },
   { href: "/bai-viet", label: "Bài viết" },
   { href: "/lien-he", label: "Liên hệ" },
 ];

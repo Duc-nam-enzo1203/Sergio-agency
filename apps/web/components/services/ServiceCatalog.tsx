@@ -16,6 +16,7 @@ export type ServiceCatalogItem = {
 const tones = [
   {
     base: "bg-ink text-cream",
+    cursor: "light" as const,
     fill: "bg-cream/[0.05]",
     glow: "rgba(253,251,247,0.12)",
     muted: "text-cream/55",
@@ -25,6 +26,7 @@ const tones = [
   },
   {
     base: "bg-[#E8E0D4] text-ink",
+    cursor: undefined,
     fill: "bg-ink/[0.04]",
     glow: "rgba(17,17,17,0.08)",
     muted: "text-ink/45",
@@ -34,6 +36,7 @@ const tones = [
   },
   {
     base: "bg-[#1C1C1C] text-cream",
+    cursor: "light" as const,
     fill: "bg-cream/[0.05]",
     glow: "rgba(253,251,247,0.1)",
     muted: "text-cream/50",
@@ -43,6 +46,7 @@ const tones = [
   },
   {
     base: "bg-[#F3EEE6] text-ink",
+    cursor: undefined,
     fill: "bg-ink/[0.035]",
     glow: "rgba(17,17,17,0.07)",
     muted: "text-ink/40",
@@ -82,6 +86,7 @@ function ServicePanel({
       onMouseMove={onMove}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
+      data-cursor={tone.cursor}
       className={`group relative grid min-h-[320px] overflow-hidden border-t border-ink/10 lg:min-h-[380px] lg:grid-cols-[1.15fr_0.85fr] ${tone.base}`}
     >
       <div

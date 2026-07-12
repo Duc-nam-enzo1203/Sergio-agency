@@ -60,7 +60,7 @@ export async function getPublishedProjects() {
   );
 }
 
-export async function getFeaturedProjects() {
+export async function getFeaturedProjects(limit = 3) {
   return prisma.project.findMany({
     where: { published: true, featured: true },
     select: {
@@ -71,9 +71,12 @@ export async function getFeaturedProjects() {
       coverImage: true,
       category: true,
       color: true,
+      client: true,
+      year: true,
+      url: true,
     },
     orderBy: { order: "asc" },
-    take: 3,
+    take: limit,
   });
 }
 

@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { SafeImage } from "@/components/ui/SafeImage";
 import Link from "next/link";
 import { AnimateOnScroll } from "@/components/ui/AnimateOnScroll";
 import { Button } from "@/components/ui/Button";
@@ -57,7 +57,7 @@ export function BlogPreview({ items }: BlogPreviewProps) {
               >
                 <div className="relative aspect-[16/10] overflow-hidden rounded-[calc(1.75rem-0.375rem)] bg-ink/5">
                   {post.coverImage ? (
-                    <Image
+                    <SafeImage
                       src={post.coverImage}
                       alt={post.title}
                       fill

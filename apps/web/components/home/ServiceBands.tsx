@@ -17,18 +17,21 @@ type ServiceBandsProps = {
 const tones = [
   {
     base: "bg-ink text-cream",
+    cursor: "light" as const,
     fill: "bg-cream/[0.06]",
     glow: "rgba(253,251,247,0.14)",
     line: "bg-cream/40",
   },
   {
     base: "bg-[#E7DFD4] text-ink",
+    cursor: undefined,
     fill: "bg-ink/[0.04]",
     glow: "rgba(17,17,17,0.09)",
     line: "bg-ink/30",
   },
   {
     base: "bg-[#222] text-cream",
+    cursor: "light" as const,
     fill: "bg-cream/[0.06]",
     glow: "rgba(253,251,247,0.12)",
     line: "bg-cream/35",
@@ -64,6 +67,7 @@ function BandCard({
       onMouseMove={onMove}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
+      data-cursor={tone.cursor}
       className={`group relative flex min-h-[240px] flex-col justify-between overflow-hidden px-7 py-10 sm:min-h-[280px] sm:px-9 sm:py-12 lg:min-h-[320px] ${tone.base}`}
     >
       {/* Soft fill rising from bottom — no box jump */}

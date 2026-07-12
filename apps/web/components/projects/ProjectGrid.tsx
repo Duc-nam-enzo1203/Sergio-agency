@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { SafeImage } from "@/components/ui/SafeImage";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { projectCategories } from "@/lib/data";
@@ -108,7 +108,7 @@ export function ProjectGrid({
                   }`}
                 >
                   {project.image ? (
-                    <Image
+                    <SafeImage
                       src={project.image}
                       alt={project.title}
                       fill

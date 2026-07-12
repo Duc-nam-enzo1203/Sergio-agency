@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { SafeImage } from "@/components/ui/SafeImage";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { AnimateOnScroll } from "@/components/ui/AnimateOnScroll";
@@ -111,7 +111,7 @@ export function PostList({ posts, pageSize = DEFAULT_PAGE_SIZE }: PostListProps)
           >
             <div className="relative aspect-[16/10] overflow-hidden bg-ink/5 ring-1 ring-ink/10 sm:aspect-[16/9]">
               {featured.coverImage ? (
-                <Image
+                <SafeImage
                   src={featured.coverImage}
                   alt={featured.title}
                   fill
@@ -177,7 +177,7 @@ export function PostList({ posts, pageSize = DEFAULT_PAGE_SIZE }: PostListProps)
             >
               <div className="relative aspect-[16/10] overflow-hidden bg-ink/5 ring-1 ring-ink/10">
                 {post.coverImage ? (
-                  <Image
+                  <SafeImage
                     src={post.coverImage}
                     alt={post.title}
                     fill

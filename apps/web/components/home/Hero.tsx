@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { SafeImage } from "@/components/ui/SafeImage";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
@@ -103,7 +103,7 @@ export function Hero({ bands = [], visualImage }: HeroProps) {
 
             <div className="absolute inset-[14%] overflow-hidden rounded-[1.75rem] bg-cream shadow-[0_30px_80px_-40px_rgba(17,17,17,0.45)] ring-1 ring-ink/10">
               {visualImage ? (
-                <Image
+                <SafeImage
                   src={visualImage}
                   alt=""
                   fill

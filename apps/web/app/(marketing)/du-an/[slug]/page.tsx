@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import { SafeImage } from "@/components/ui/SafeImage";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CtaSection } from "@/components/home/CtaSection";
@@ -48,7 +48,10 @@ export default async function ProjectDetailPage({ params }: Props) {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-ink text-cream">
+      <section
+        data-cursor="light"
+        className="relative overflow-hidden bg-ink text-cream"
+      >
         <div className="relative site-container pt-28 pb-10 sm:pt-32 sm:pb-12">
           <AnimateOnScroll>
             <Link
@@ -82,7 +85,7 @@ export default async function ProjectDetailPage({ params }: Props) {
 
         <div className="relative aspect-[16/10] w-full overflow-hidden bg-ink/80 sm:aspect-[21/9]">
           {project.coverImage ? (
-            <Image
+            <SafeImage
               src={project.coverImage}
               alt={project.title}
               fill
@@ -202,7 +205,7 @@ export default async function ProjectDetailPage({ params }: Props) {
                         : "aspect-[4/3]"
                     }`}
                   >
-                    <Image
+                    <SafeImage
                       src={img}
                       alt={`${project.title} ${i + 2}`}
                       fill
@@ -242,7 +245,7 @@ export default async function ProjectDetailPage({ params }: Props) {
                   >
                     <div className="relative aspect-[16/10] overflow-hidden bg-ink/5 ring-1 ring-ink/10">
                       {p.coverImage ? (
-                        <Image
+                        <SafeImage
                           src={p.coverImage}
                           alt={p.title}
                           fill

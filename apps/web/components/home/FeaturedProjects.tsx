@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { SafeImage } from "@/components/ui/SafeImage";
 import Link from "next/link";
 import { AnimateOnScroll } from "@/components/ui/AnimateOnScroll";
 
@@ -76,7 +76,7 @@ export function FeaturedProjects({ items }: FeaturedProjectsProps) {
 
                 <div className="order-1 relative aspect-[16/10] overflow-hidden rounded-[1.5rem] bg-ink/5 ring-1 ring-ink/10 sm:aspect-[16/9] lg:order-2 lg:aspect-[5/3]">
                   {project.coverImage ? (
-                    <Image
+                    <SafeImage
                       src={project.coverImage}
                       alt={project.title}
                       fill

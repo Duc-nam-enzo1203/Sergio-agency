@@ -40,7 +40,10 @@ export default async function ServiceDetailPage({ params }: Props) {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-ink text-cream">
+      <section
+        data-cursor="light"
+        className="relative overflow-hidden bg-ink text-cream"
+      >
         <div aria-hidden className="pointer-events-none absolute inset-0">
           <div className="absolute -right-20 top-10 font-display text-[18rem] font-semibold leading-none tracking-tighter text-cream/[0.04] sm:text-[22rem]">
             {num}

@@ -58,6 +58,30 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "oceancityhanoi.vn",
       },
+      {
+        protocol: "https",
+        hostname: "konlift.vn",
+      },
+      {
+        protocol: "https",
+        hostname: "**.vinhomes.vn",
+      },
+      {
+        protocol: "https",
+        hostname: "**.dav.edu.vn",
+      },
+      {
+        protocol: "https",
+        hostname: "imagebeauty.vn",
+      },
+      {
+        protocol: "https",
+        hostname: "thecanopyresidences.vn",
+      },
+      {
+        protocol: "https",
+        hostname: "sassypantslingerie.co.uk",
+      },
     ],
   },
   async headers() {

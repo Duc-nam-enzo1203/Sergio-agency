@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import { SafeImage } from "@/components/ui/SafeImage";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CtaSection } from "@/components/home/CtaSection";
@@ -170,7 +170,7 @@ export default async function PostDetailPage({ params }: Props) {
 
         {post.coverImage ? (
           <div className="relative aspect-[16/10] w-full overflow-hidden bg-ink/5 sm:aspect-[21/9]">
-            <Image
+            <SafeImage
               src={post.coverImage}
               alt={post.title}
               fill
@@ -216,7 +216,7 @@ export default async function PostDetailPage({ params }: Props) {
                   >
                     <div className="relative aspect-[16/10] overflow-hidden bg-ink/5 ring-1 ring-ink/10">
                       {p.coverImage ? (
-                        <Image
+                        <SafeImage
                           src={p.coverImage}
                           alt={p.title}
                           fill
