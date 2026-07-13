@@ -2,10 +2,18 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CtaSection } from "@/components/home/CtaSection";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { Button } from "@/components/ui/Button";
 import { FaqAccordion } from "@/components/ui/FaqAccordion";
 import { AnimateOnScroll } from "@/components/ui/AnimateOnScroll";
 import { getPublishedServices, getServiceBySlug } from "@/lib/queries";
+import {
+  breadcrumbJsonLd,
+  faqPageJsonLd,
+  serviceJsonLd,
+} from "@/lib/seo/json-ld";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+import { absoluteUrl } from "@/lib/seo/site";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -18,10 +26,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const service = await getServiceBySlug(slug);
   if (!service) return { title: "Không tìm thấy" };
-  return {
-    title: `${service.title} — Sergio Agency`,
-    description: service.description ?? undefined,
-  };
+  return buildPageMetadata({
+    title: service.title,
+    description: service.description,
+    path: `/dich-vu/${service.slug}`,
+  });
 }
 
 export default async function ServiceDetailPage({ params }: Props) {
@@ -40,6 +49,22 @@ export default async function ServiceDetailPage({ params }: Props) {
 
   return (
     <>
+      <JsonLd
+        data={[
+          serviceJsonLd({
+            name: service.title,
+            description: service.description,
+            path: `/dich-vu/${service.slug}`,
+            priceFrom: service.priceFrom,
+          }),
+          faqPageJsonLd(service.faq, absoluteUrl(`/dich-vu/${service.slug}`)),
+          breadcrumbJsonLd([
+            { name: "Trang chủ", path: "/" },
+            { name: "Dịch vụ", path: "/dich-vu" },
+            { name: service.title, path: `/dich-vu/${service.slug}` },
+          ]),
+        ]}
+      />
       <section
         data-cursor="light"
         className="relative overflow-hidden bg-ink text-cream"

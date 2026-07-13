@@ -1,15 +1,16 @@
-import type { Metadata } from "next";
 import { CtaSection } from "@/components/home/CtaSection";
 import { ProjectGrid } from "@/components/projects/ProjectGrid";
 import { AnimateOnScroll } from "@/components/ui/AnimateOnScroll";
 import { Button } from "@/components/ui/Button";
 import { getPublishedProjects } from "@/lib/queries";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Dự án — Sergio Agency",
+export const metadata = buildPageMetadata({
+  title: "Dự án",
   description:
     "Portfolio các dự án website, landing page và e-commerce đã thực hiện.",
-};
+  path: "/du-an",
+});
 
 export default async function ProjectsPage() {
   const projects = await getPublishedProjects();

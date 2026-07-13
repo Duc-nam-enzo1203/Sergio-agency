@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SiteLogo } from "@/components/ui/SiteLogo";
 import { navLinks, siteConfig } from "@/lib/data";
 
 export function Footer() {
@@ -9,12 +10,7 @@ export function Footer() {
       <div className="site-container py-16 lg:py-20">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-2">
-            <Link
-              href="/"
-              className="font-display text-xl font-semibold text-ink"
-            >
-              {siteConfig.name}
-            </Link>
+            <SiteLogo size="md" />
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-ink/60">
               Agency thiết kế website và landing page hiện đại — giúp thương
               hiệu của bạn tỏa sáng trên môi trường số.

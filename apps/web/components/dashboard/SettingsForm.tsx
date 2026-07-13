@@ -38,7 +38,7 @@ export function SettingsForm({ initial }: SettingsFormProps) {
   }
 
   return (
-    <div className="max-w-xl">
+    <div className="w-full max-w-xl">
       <h2 className="mb-6 font-display text-xl font-semibold">Thông tin site</h2>
       <form onSubmit={handleSave} className="space-y-4">
         {(["siteName", "tagline", "email", "phone", "address"] as const).map(
@@ -61,7 +61,7 @@ export function SettingsForm({ initial }: SettingsFormProps) {
         <button
           type="submit"
           disabled={loading}
-          className="rounded-full bg-white px-8 py-3 text-sm font-medium text-black hover:bg-white/90 disabled:opacity-50"
+          className="w-full rounded-full bg-white px-8 py-3 text-sm font-medium text-black hover:bg-white/90 disabled:opacity-50 sm:w-auto"
         >
           {loading ? "Đang lưu..." : "Lưu cài đặt"}
         </button>

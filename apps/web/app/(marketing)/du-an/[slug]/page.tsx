@@ -3,6 +3,7 @@ import { SafeImage } from "@/components/ui/SafeImage";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CtaSection } from "@/components/home/CtaSection";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { Button } from "@/components/ui/Button";
 import { AnimateOnScroll } from "@/components/ui/AnimateOnScroll";
 import {
@@ -10,6 +11,8 @@ import {
   getPublishedProjects,
   getRelatedProjects,
 } from "@/lib/queries";
+import { breadcrumbJsonLd, creativeWorkJsonLd } from "@/lib/seo/json-ld";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -22,10 +25,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const project = await getProjectBySlug(slug);
   if (!project) return { title: "Không tìm thấy" };
-  return {
-    title: `${project.title} — Sergio Agency`,
-    description: project.description ?? undefined,
-  };
+  return buildPageMetadata({
+    title: project.title,
+    description: project.description,
+    path: `/du-an/${project.slug}`,
+    image: project.coverImage,
+  });
 }
 
 export default async function ProjectDetailPage({ params }: Props) {
@@ -48,6 +53,24 @@ export default async function ProjectDetailPage({ params }: Props) {
 
   return (
     <>
+      <JsonLd
+        data={[
+          creativeWorkJsonLd({
+            name: project.title,
+            description: project.description,
+            path: `/du-an/${project.slug}`,
+            image: project.coverImage,
+            dateCreated: project.year,
+            keywords: project.techStack,
+            url: project.url,
+          }),
+          breadcrumbJsonLd([
+            { name: "Trang chủ", path: "/" },
+            { name: "Dự án", path: "/du-an" },
+            { name: project.title, path: `/du-an/${project.slug}` },
+          ]),
+        ]}
+      />
       <section
         data-cursor="light"
         className="relative overflow-hidden bg-ink text-cream"

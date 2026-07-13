@@ -65,12 +65,15 @@ export default async function DashboardPage() {
         ) : (
           <ul className="divide-y divide-white/10">
             {leads.map((lead) => (
-              <li key={lead.id} className="flex items-center justify-between px-6 py-4">
-                <div>
-                  <p className="font-medium">{lead.name}</p>
-                  <p className="text-sm text-white/50">{lead.email}</p>
+              <li
+                key={lead.id}
+                className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6"
+              >
+                <div className="min-w-0">
+                  <p className="font-medium break-words">{lead.name}</p>
+                  <p className="text-sm text-white/50 break-all">{lead.email}</p>
                 </div>
-                <span className="rounded-full bg-white/10 px-3 py-1 text-xs">
+                <span className="w-fit rounded-full bg-white/10 px-3 py-1 text-xs">
                   {lead.status}
                 </span>
               </li>

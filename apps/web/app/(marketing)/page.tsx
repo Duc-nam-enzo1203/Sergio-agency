@@ -4,12 +4,28 @@ import { CtaSection } from "@/components/home/CtaSection";
 import { FeaturedProjects } from "@/components/home/FeaturedProjects";
 import { Hero } from "@/components/home/Hero";
 import { TrustedMarquee } from "@/components/home/TrustedMarquee";
+import { siteConfig } from "@/lib/data";
 import {
   getFeaturedProjects,
   getHomeServices,
   getLatestPosts,
   getPublishedProjects,
 } from "@/lib/queries";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+
+const homeMeta = buildPageMetadata({
+  title: `${siteConfig.name} — ${siteConfig.tagline}`,
+  description:
+    "Agency thiết kế website và landing page hiện đại. Giúp thương hiệu của bạn tỏa sáng với thiết kế đẹp mắt và công nghệ tiên tiến.",
+  path: "/",
+});
+
+export const metadata = {
+  ...homeMeta,
+  title: {
+    absolute: `${siteConfig.name} — ${siteConfig.tagline}`,
+  },
+};
 
 export default async function HomePage() {
   const [services, featured, allProjects, posts] = await Promise.all([

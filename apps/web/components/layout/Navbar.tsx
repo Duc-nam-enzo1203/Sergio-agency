@@ -4,7 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { navLinks, siteConfig } from "@/lib/data";
+import { SiteLogo } from "@/components/ui/SiteLogo";
+import { navLinks } from "@/lib/data";
 
 function isDarkHeroPath(pathname: string) {
   return (
@@ -51,14 +52,12 @@ export function Navbar() {
                 : "bg-transparent"
           }`}
         >
-          <Link
-            href="/"
-            className={`font-display text-lg font-semibold tracking-tight transition-colors duration-500 ${
-              lightNav ? "text-cream" : "text-ink"
-            }`}
-          >
-            {siteConfig.name}
-          </Link>
+          <SiteLogo
+            size="sm"
+            light={lightNav}
+            priority
+            className="transition-colors duration-500"
+          />
 
           <ul className="hidden items-center gap-1 md:flex">
             {navLinks.map((link) => {

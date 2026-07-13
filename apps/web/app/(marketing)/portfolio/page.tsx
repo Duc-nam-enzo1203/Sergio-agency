@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CtaSection } from "@/components/home/CtaSection";
+import { PortfolioSkills } from "@/components/portfolio/PortfolioSkills";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { AnimateOnScroll } from "@/components/ui/AnimateOnScroll";
 import { Button } from "@/components/ui/Button";
 import {
@@ -12,11 +14,14 @@ import {
   portfolioTraits,
 } from "@/lib/portfolio";
 import { getFeaturedProjects, getPublishedProjects } from "@/lib/queries";
+import { breadcrumbJsonLd, personJsonLd } from "@/lib/seo/json-ld";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Portfolio — Đoàn Đức Nam | Sergio Agency",
+export const metadata: Metadata = buildPageMetadata({
+  title: "Portfolio — Đoàn Đức Nam",
   description: portfolioProfile.summary,
-};
+  path: "/portfolio",
+});
 
 const phoneDigits = portfolioProfile.phone.replace(/\D/g, "");
 
@@ -29,6 +34,23 @@ export default async function PortfolioPage() {
 
   return (
     <>
+      <JsonLd
+        data={[
+          personJsonLd({
+            name: portfolioProfile.name,
+            jobTitle: portfolioProfile.title,
+            description: portfolioProfile.summary,
+            email: portfolioProfile.email,
+            telephone: portfolioProfile.phone,
+            path: "/portfolio",
+            address: portfolioProfile.location,
+          }),
+          breadcrumbJsonLd([
+            { name: "Trang chủ", path: "/" },
+            { name: "Portfolio", path: "/portfolio" },
+          ]),
+        ]}
+      />
       {/* Hero */}
       <section className="relative overflow-hidden pt-28 pb-16 sm:pt-36 sm:pb-24">
         <div aria-hidden className="pointer-events-none absolute inset-0">
@@ -110,51 +132,7 @@ export default async function PortfolioPage() {
         </div>
       </section>
 
-      {/* Skills */}
-      <section className="border-y border-ink/10 bg-[#F3EEE6] py-20 sm:py-28">
-        <div className="site-container">
-          <AnimateOnScroll>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-ink/40">
-              Capabilities
-            </p>
-            <h2 className="font-display mt-4 max-w-[14ch] text-[clamp(2rem,4.5vw,3.5rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-ink">
-              Kỹ năng chuyên môn.
-            </h2>
-          </AnimateOnScroll>
-
-          <div className="mt-12 grid gap-0 sm:grid-cols-2 lg:grid-cols-3">
-            {portfolioSkills.map((group, i) => (
-              <AnimateOnScroll key={group.title} delay={0.05 + i * 0.05}>
-                <div
-                  className={`border-t border-ink/10 py-8 pr-6 sm:border-t-0 sm:border-l sm:border-ink/10 sm:py-4 sm:pl-8 ${
-                    i === 0 ? "sm:border-l-0 sm:pl-0" : ""
-                  } ${i === 3 ? "lg:border-l-0 lg:pl-0 lg:border-t lg:pt-10" : ""} ${
-                    i > 2 ? "lg:border-t lg:pt-10" : ""
-                  }`}
-                >
-                  <h3 className="font-display text-lg font-semibold text-ink">
-                    {group.title}
-                  </h3>
-                  <ul className="mt-4 space-y-2">
-                    {group.items.map((item) => (
-                      <li
-                        key={item}
-                        className="flex items-start gap-3 text-sm leading-relaxed text-ink/60"
-                      >
-                        <span
-                          aria-hidden
-                          className="mt-2 h-1 w-1 shrink-0 rounded-full bg-ink/30"
-                        />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </AnimateOnScroll>
-            ))}
-          </div>
-        </div>
-      </section>
+      <PortfolioSkills groups={portfolioSkills} />
 
       {/* Experience */}
       <section className="bg-cream py-20 sm:py-28">

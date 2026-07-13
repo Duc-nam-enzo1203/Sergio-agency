@@ -1,9 +1,0 @@
-User-Agent: *
-Allow: /
-Disallow: /dashboard
-Disallow: /api/
-Disallow: /dang-nhap
-Disallow: /dang-ky
-Disallow: /quen-mat-khau
-
-Sitemap: /sitemap.xml

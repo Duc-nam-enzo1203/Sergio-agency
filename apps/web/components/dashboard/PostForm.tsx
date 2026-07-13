@@ -83,7 +83,7 @@ export function PostForm({ initial }: PostFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-2xl space-y-5">
+    <form onSubmit={handleSubmit} className="w-full max-w-2xl space-y-5">
       {error && (
         <p className="rounded-xl bg-red-500/10 px-4 py-3 text-sm text-red-300">
           {error}
@@ -180,7 +180,7 @@ export function PostForm({ initial }: PostFormProps) {
       <button
         type="submit"
         disabled={loading}
-        className="rounded-full bg-white px-8 py-3 text-sm font-medium text-black hover:bg-white/90 disabled:opacity-50"
+        className="w-full rounded-full bg-white px-8 py-3 text-sm font-medium text-black hover:bg-white/90 disabled:opacity-50 sm:w-auto"
       >
         {loading ? "Đang lưu..." : form.id ? "Cập nhật" : "Tạo bài viết"}
       </button>

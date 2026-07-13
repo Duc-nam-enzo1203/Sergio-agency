@@ -1,14 +1,15 @@
-import type { Metadata } from "next";
 import { CtaSection } from "@/components/home/CtaSection";
 import { PostList } from "@/components/blog/PostList";
 import { AnimateOnScroll } from "@/components/ui/AnimateOnScroll";
 import { Button } from "@/components/ui/Button";
 import { getPublishedPosts } from "@/lib/queries";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Bài viết — Sergio Agency",
+export const metadata = buildPageMetadata({
+  title: "Bài viết",
   description: "Kiến thức về thiết kế web, landing page và digital marketing.",
-};
+  path: "/bai-viet",
+});
 
 export default async function BlogPage() {
   const posts = await getPublishedPosts();

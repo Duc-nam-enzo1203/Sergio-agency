@@ -3,12 +3,15 @@ import { SafeImage } from "@/components/ui/SafeImage";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CtaSection } from "@/components/home/CtaSection";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { AnimateOnScroll } from "@/components/ui/AnimateOnScroll";
 import {
   getPostBySlug,
   getPublishedPosts,
   getRelatedPosts,
 } from "@/lib/queries";
+import { articleJsonLd, breadcrumbJsonLd } from "@/lib/seo/json-ld";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -21,10 +24,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = await getPostBySlug(slug);
   if (!post) return { title: "Không tìm thấy" };
-  return {
-    title: `${post.title} — Sergio Agency`,
-    description: post.excerpt ?? undefined,
-  };
+  return buildPageMetadata({
+    title: post.title,
+    description: post.excerpt,
+    path: `/bai-viet/${post.slug}`,
+    image: post.coverImage,
+    type: "article",
+  });
 }
 
 function renderMarkdown(content: string) {
@@ -109,6 +115,24 @@ export default async function PostDetailPage({ params }: Props) {
 
   return (
     <>
+      <JsonLd
+        data={[
+          articleJsonLd({
+            title: post.title,
+            description: post.excerpt,
+            path: `/bai-viet/${post.slug}`,
+            image: post.coverImage,
+            datePublished: post.publishedAt,
+            dateModified: post.updatedAt,
+            author: post.author,
+          }),
+          breadcrumbJsonLd([
+            { name: "Trang chủ", path: "/" },
+            { name: "Bài viết", path: "/bai-viet" },
+            { name: post.title, path: `/bai-viet/${post.slug}` },
+          ]),
+        ]}
+      />
       <article>
         <section className="relative overflow-hidden pt-28 pb-12 sm:pt-36 sm:pb-16">
           <div aria-hidden className="pointer-events-none absolute inset-0">

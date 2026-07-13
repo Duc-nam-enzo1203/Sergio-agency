@@ -1,16 +1,17 @@
-import type { Metadata } from "next";
 import { CtaSection } from "@/components/home/CtaSection";
 import { ServiceCatalog } from "@/components/services/ServiceCatalog";
 import { ServicesProcess } from "@/components/services/ServicesProcess";
 import { AnimateOnScroll } from "@/components/ui/AnimateOnScroll";
 import { Button } from "@/components/ui/Button";
 import { getPublishedServices } from "@/lib/queries";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Dịch vụ — Sergio Agency",
+export const metadata = buildPageMetadata({
+  title: "Dịch vụ",
   description:
     "Dịch vụ thiết kế website, landing page, branding và bảo trì cho doanh nghiệp.",
-};
+  path: "/dich-vu",
+});
 
 export default async function ServicesPage() {
   const services = await getPublishedServices();

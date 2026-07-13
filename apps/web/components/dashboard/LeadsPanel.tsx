@@ -39,13 +39,13 @@ export function LeadsPanel({ leads }: { leads: LeadItem[] }) {
           key={lead.id}
           className="rounded-2xl border border-white/10 bg-white/5 p-4"
         >
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
             <div>
-              <p className="font-medium">{lead.name}</p>
-              <p className="text-sm text-white/50">{lead.email}</p>
+              <p className="font-medium break-words">{lead.name}</p>
+              <p className="text-sm text-white/50 break-all">{lead.email}</p>
               <p className="mt-2 text-sm text-white/70">{lead.message}</p>
             </div>
-            <div className="w-36 shrink-0">
+            <div className="w-full sm:w-36 sm:shrink-0">
               <DarkSelect
                 value={lead.status}
                 onChange={(value) => updateLeadStatus(lead.id, value)}

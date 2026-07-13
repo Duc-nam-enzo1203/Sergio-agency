@@ -1,13 +1,14 @@
-import type { Metadata } from "next";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { AnimateOnScroll } from "@/components/ui/AnimateOnScroll";
 import { siteConfig } from "@/lib/data";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Liên hệ — Sergio Agency",
+export const metadata = buildPageMetadata({
+  title: "Liên hệ",
   description:
     "Liên hệ Sergio Agency để nhận tư vấn và báo giá thiết kế website, landing page.",
-};
+  path: "/lien-he",
+});
 
 const phoneDigits = siteConfig.phone.replace(/\D/g, "");
 
